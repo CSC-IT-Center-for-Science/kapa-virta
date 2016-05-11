@@ -78,6 +78,24 @@ public class WSDLManipulator {
 
         root.appendChild(xroadReqHeadersElement);
 
+        // Append xroad wsdl:binding operation headers
+        NodeList xroadBindings = doc.getElementsByTagName("wsdl:binding");
+
+        for(int i = 0; i < xroadBindings.getLength(); ++i) {
+            NodeList operations = xroadBindings.item(i).getChildNodes();
+            Node input = operations.item(0);
+            if(input.getNodeType() == Node.ELEMENT_NODE) {
+                Element inputElement = (Element) input;
+                Element el = doc.createElement("soap:header");
+                el.setAttribute("message", "tns:requestheader");
+                el.setAttribute("part", "client");
+                el.setAttribute("use", "literal");
+                inputElement.appendChild(el);
+                xroadBindings.item(i).replaceChild(input, inputElement);
+            }
+            Node output = operations.item(1);
+        }
+
 
         // Write manipulated WSDL to file
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
