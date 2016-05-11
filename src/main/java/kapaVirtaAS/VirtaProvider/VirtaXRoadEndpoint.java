@@ -1,6 +1,5 @@
 package kapaVirtaAS.VirtaProvider;
 
-import com.sun.xml.internal.messaging.saaj.soap.MessageImpl;
 import kapaVirtaAS.VirtaClient.VirtaClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;

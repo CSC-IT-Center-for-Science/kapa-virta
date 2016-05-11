@@ -16,7 +16,7 @@ public class VirtaClient extends WebServiceGatewaySupport {
         return getWebServiceTemplate().marshalSendAndReceive(xroadRequest);
     }
 
-    public <RES> getVirtaResponse(<A> request){
+    public TutkinnotResponse getVirtaResponse(TutkinnotRequest request){
         return (TutkinnotResponse) getWebServiceTemplate().marshalSendAndReceive(request);
     }
 
