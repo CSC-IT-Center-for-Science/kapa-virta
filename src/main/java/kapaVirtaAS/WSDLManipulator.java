@@ -22,6 +22,14 @@ public class WSDLManipulator {
     private static final String xroadSchema = "xrd";
     private static final String[] xroadReqHeaders = {"client", "service", "userId", "id", "issue", "protocolVersion"};
 
+    public static Element replaceAttribute(Element el, String name) {
+        el.removeAttribute("xmlns:tns");
+        el.removeAttribute("targetNamespace");
+        el.setAttribute("xmlns:tns", serviceName);
+        el.setAttribute("targetNamespace", serviceName);
+        return el;
+    }
+
     public static void generateVirtaKapaWSDL() throws Exception{
         // Fetch current WSDL-file
         File inputFile = new File("target/wsdl/opiskelijatiedot.wsdl");
@@ -39,10 +47,7 @@ public class WSDLManipulator {
         root.setAttribute("xmlns:"+xroadSchema, "http://x-road.eu/xsd/xroad.xsd");
         root.setAttribute("xmlns:id", "http://x-road.eu/xsd/identifiers");
 
-        root.removeAttribute("xmlns:tns");
-        root.removeAttribute("targetNamespace");
-        root.setAttribute("xmlns:tns", serviceName);
-        root.setAttribute("targetNamespace", serviceName);
+        root = replaceAttribute(root, "xmlns:tns");
 
         // Schema elements <xs:schema> attribute manipulations
         NodeList schemas = root.getElementsByTagName("xs:schema");
