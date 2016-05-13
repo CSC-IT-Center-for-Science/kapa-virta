@@ -29,6 +29,13 @@ public class WSDLManipulator {
         el.setAttribute("targetNamespace", serviceName);
         return el;
     }
+    
+    public static Element soapHeader(Element el, String message, String part, String use) {
+        el.setAttribute("message", message);
+        el.setAttribute("part", part);
+        el.setAttribute("use", use);
+        return el;
+    }
 
     public static void generateVirtaKapaWSDL() throws Exception{
         // Fetch current WSDL-file
@@ -79,21 +86,26 @@ public class WSDLManipulator {
         root.appendChild(xroadReqHeadersElement);
 
         // Append xroad wsdl:binding operation headers
-        NodeList xroadBindings = doc.getElementsByTagName("wsdl:binding");
-
-        for(int i = 0; i < xroadBindings.getLength(); ++i) {
-            NodeList operations = xroadBindings.item(i).getChildNodes();
-            Node input = operations.item(0);
-            if(input.getNodeType() == Node.ELEMENT_NODE) {
-                Element inputElement = (Element) input;
-                Element el = doc.createElement("soap:header");
-                el.setAttribute("message", "tns:requestheader");
-                el.setAttribute("part", "client");
-                el.setAttribute("use", "literal");
-                inputElement.appendChild(el);
-                xroadBindings.item(i).replaceChild(input, inputElement);
+        NodeList childrenList = root.getChildNodes();
+        for (int i = 0; i < childrenList.getLength(); ++i) {
+            if (childrenList.item(i).getNodeName().contains("wsdl:binding")) {
+                NodeList binding = childrenList.item(i).getChildNodes();
+                for (int j = 0; j < binding.getLength(); ++j) {
+                    if (binding.item(j).getNodeName().contains("wsdl:operation")) {
+                        for (Node child = binding.item(j).getFirstChild(); child != null; child = child.getNextSibling()) {
+                            if (child.getNodeName().contains("wsdl:input") || child.getNodeName().contains("wsdl:output")) {
+                                Element el = (Element) child;
+                                el.appendChild(soapHeader(doc.createElement("soap:header"), "tns:requesheader", "client", "literal"));
+                                el.appendChild(soapHeader(doc.createElement("soap:header"), "tns:requesheader", "service", "literal"));
+                                el.appendChild(soapHeader(doc.createElement("soap:header"), "tns:requesheader", "userId", "literal"));
+                                el.appendChild(soapHeader(doc.createElement("soap:header"), "tns:requesheader", "id", "literal"));
+                                el.appendChild(soapHeader(doc.createElement("soap:header"), "tns:requesheader", "issue", "literal"));
+                                el.appendChild(soapHeader(doc.createElement("soap:header"), "tns:requesheader", "protocolVersion", "literal"));
+                            }
+                        }
+                    }
+                }
             }
-            Node output = operations.item(1);
         }
 
 
