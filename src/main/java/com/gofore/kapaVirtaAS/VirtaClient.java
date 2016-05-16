@@ -1,4 +1,4 @@
-package kapaVirtaAS;
+package com.gofore.kapaVirtaAS;
 
 /**
  * Created by joni on 9.5.2016.
@@ -11,28 +11,12 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Source;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 
 public class VirtaClient {
 
     private static final Logger log = LoggerFactory.getLogger(VirtaClient.class);
-    private final String testSoapMessage = "<x:Envelope xmlns:x=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:luk=\"http://tietovaranto.csc.fi/luku\"><x:Header/><x:Body><luk:LukukausiIlmoittautumisetRequest><luk:Kutsuja><luk:jarjestelma/><luk:tunnus/><luk:avain>salaisuus</luk:avain></luk:Kutsuja><luk:Hakuehdot><luk:kansallinenOppijanumero>d09afd87a8c6d76b76bbd</luk:kansallinenOppijanumero><luk:organisaatio>00001</luk:organisaatio></luk:Hakuehdot></luk:LukukausiIlmoittautumisetRequest></x:Body></x:Envelope>";
 
     public VirtaClient() {
     }

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:id="http://x-road.eu/xsd/identifiers" xmlns:sch0="http://tietovaranto.csc.fi/luku" xmlns:sch1="urn:mace:funet.fi:virta/2015/09/01" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://test.x-road.virta.csc.fi/producer" xmlns:xrd="http://x-road.eu/xsd/xroad.xsd" targetNamespace="http://test.x-road.virta.csc.fi/producer">
+<?xml version="1.1" encoding="UTF-8" standalone="no"?><wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:id="http://x-road.eu/xsd/identifiers" xmlns:sch0="http://tietovaranto.csc.fi/luku" xmlns:sch1="urn:mace:funet.fi:virta/2015/09/01" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://test.x-road.virta.csc.fi/producer" xmlns:xrd="http://x-road.eu/xsd/xroad.xsd" targetNamespace="http://test.x-road.virta.csc.fi/producer">
   <wsdl:types>
     <xs:schema xmlns:virta="urn:mace:funet.fi:virta/2015/09/01" xmlns:virtaluku="http://test.x-road.virta.csc.fi/producer" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://test.x-road.virta.csc.fi/producer"><xs:import namespace="urn:mace:funet.fi:virta/2015/09/01"/><xs:complexType name="Kutsuja"><xs:sequence><xs:element name="jarjestelma"><xs:annotation><xs:documentation xml:lang="fi">
             Lukurajapintaa käyttävän eli kutsuvan järjestelmän nimi (esim. TIPTOP).
@@ -701,37 +701,37 @@
   </wsdl:message>
   <wsdl:portType name="OpiskelijanTiedot">
     <wsdl:operation name="Opintosuoritukset">
-      <wsdl:input message="tns:OpintosuorituksetRequest" name="OpintosuorituksetRequest">
+      <wsdl:input message="tns:OpintosuorituksetRequest" name="Opintosuoritukset">
     </wsdl:input>
       <wsdl:output message="tns:OpintosuorituksetResponse" name="OpintosuorituksetResponse">
     </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="OpiskelijanTiedot">
-      <wsdl:input message="tns:OpiskelijanTiedotRequest" name="OpiskelijanTiedotRequest">
+      <wsdl:input message="tns:OpiskelijanTiedotRequest" name="OpiskelijanTiedot">
     </wsdl:input>
       <wsdl:output message="tns:OpiskelijanTiedotResponse" name="OpiskelijanTiedotResponse">
     </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="Tutkinnot">
-      <wsdl:input message="tns:TutkinnotRequest" name="TutkinnotRequest">
+      <wsdl:input message="tns:TutkinnotRequest" name="Tutkinnot">
     </wsdl:input>
       <wsdl:output message="tns:TutkinnotResponse" name="TutkinnotResponse">
     </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="Opiskeluoikeudet">
-      <wsdl:input message="tns:OpiskeluoikeudetRequest" name="OpiskeluoikeudetRequest">
+      <wsdl:input message="tns:OpiskeluoikeudetRequest" name="Opiskeluoikeudet">
     </wsdl:input>
       <wsdl:output message="tns:OpiskeluoikeudetResponse" name="OpiskeluoikeudetResponse">
     </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="OpiskelijanKaikkiTiedot">
-      <wsdl:input message="tns:OpiskelijanKaikkiTiedotRequest" name="OpiskelijanKaikkiTiedotRequest">
+      <wsdl:input message="tns:OpiskelijanKaikkiTiedotRequest" name="OpiskelijanKaikkiTiedot">
     </wsdl:input>
       <wsdl:output message="tns:OpiskelijanKaikkiTiedotResponse" name="OpiskelijanKaikkiTiedotResponse">
     </wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="LukukausiIlmoittautumiset">
-      <wsdl:input message="tns:LukukausiIlmoittautumisetRequest" name="LukukausiIlmoittautumisetRequest">
+      <wsdl:input message="tns:LukukausiIlmoittautumisetRequest" name="LukukausiIlmoittautumiset">
     </wsdl:input>
       <wsdl:output message="tns:LukukausiIlmoittautumisetResponse" name="LukukausiIlmoittautumisetResponse">
     </wsdl:output>
@@ -741,62 +741,62 @@
     <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
     <wsdl:operation name="Opintosuoritukset">
       <soap:operation soapAction=""/>
-      <wsdl:input name="OpintosuorituksetRequest">
+      <wsdl:input name="Opintosuoritukset">
         <soap:body use="literal"/>
-      </wsdl:input>
+      <soap:header message="tns:requesheader" part="client" use="literal"/><soap:header message="tns:requesheader" part="service" use="literal"/><soap:header message="tns:requesheader" part="userId" use="literal"/><soap:header message="tns:requesheader" part="id" use="literal"/><soap:header message="tns:requesheader" part="issue" use="literal"/><soap:header message="tns:requesheader" part="protocolVersion" use="literal"/></wsdl:input>
       <wsdl:output name="OpintosuorituksetResponse">
         <soap:body use="literal"/>
-      </wsdl:output>
+      <soap:header message="tns:requesheader" part="client" use="literal"/><soap:header message="tns:requesheader" part="service" use="literal"/><soap:header message="tns:requesheader" part="userId" use="literal"/><soap:header message="tns:requesheader" part="id" use="literal"/><soap:header message="tns:requesheader" part="issue" use="literal"/><soap:header message="tns:requesheader" part="protocolVersion" use="literal"/></wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="OpiskelijanTiedot">
       <soap:operation soapAction=""/>
-      <wsdl:input name="OpiskelijanTiedotRequest">
+      <wsdl:input name="OpiskelijanTiedot">
         <soap:body use="literal"/>
-      </wsdl:input>
+      <soap:header message="tns:requesheader" part="client" use="literal"/><soap:header message="tns:requesheader" part="service" use="literal"/><soap:header message="tns:requesheader" part="userId" use="literal"/><soap:header message="tns:requesheader" part="id" use="literal"/><soap:header message="tns:requesheader" part="issue" use="literal"/><soap:header message="tns:requesheader" part="protocolVersion" use="literal"/></wsdl:input>
       <wsdl:output name="OpiskelijanTiedotResponse">
         <soap:body use="literal"/>
-      </wsdl:output>
+      <soap:header message="tns:requesheader" part="client" use="literal"/><soap:header message="tns:requesheader" part="service" use="literal"/><soap:header message="tns:requesheader" part="userId" use="literal"/><soap:header message="tns:requesheader" part="id" use="literal"/><soap:header message="tns:requesheader" part="issue" use="literal"/><soap:header message="tns:requesheader" part="protocolVersion" use="literal"/></wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="Tutkinnot">
       <soap:operation soapAction=""/>
-      <wsdl:input name="TutkinnotRequest">
+      <wsdl:input name="Tutkinnot">
         <soap:body use="literal"/>
-      </wsdl:input>
+      <soap:header message="tns:requesheader" part="client" use="literal"/><soap:header message="tns:requesheader" part="service" use="literal"/><soap:header message="tns:requesheader" part="userId" use="literal"/><soap:header message="tns:requesheader" part="id" use="literal"/><soap:header message="tns:requesheader" part="issue" use="literal"/><soap:header message="tns:requesheader" part="protocolVersion" use="literal"/></wsdl:input>
       <wsdl:output name="TutkinnotResponse">
         <soap:body use="literal"/>
-      </wsdl:output>
+      <soap:header message="tns:requesheader" part="client" use="literal"/><soap:header message="tns:requesheader" part="service" use="literal"/><soap:header message="tns:requesheader" part="userId" use="literal"/><soap:header message="tns:requesheader" part="id" use="literal"/><soap:header message="tns:requesheader" part="issue" use="literal"/><soap:header message="tns:requesheader" part="protocolVersion" use="literal"/></wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="Opiskeluoikeudet">
       <soap:operation soapAction=""/>
-      <wsdl:input name="OpiskeluoikeudetRequest">
+      <wsdl:input name="Opiskeluoikeudet">
         <soap:body use="literal"/>
-      </wsdl:input>
+      <soap:header message="tns:requesheader" part="client" use="literal"/><soap:header message="tns:requesheader" part="service" use="literal"/><soap:header message="tns:requesheader" part="userId" use="literal"/><soap:header message="tns:requesheader" part="id" use="literal"/><soap:header message="tns:requesheader" part="issue" use="literal"/><soap:header message="tns:requesheader" part="protocolVersion" use="literal"/></wsdl:input>
       <wsdl:output name="OpiskeluoikeudetResponse">
         <soap:body use="literal"/>
-      </wsdl:output>
+      <soap:header message="tns:requesheader" part="client" use="literal"/><soap:header message="tns:requesheader" part="service" use="literal"/><soap:header message="tns:requesheader" part="userId" use="literal"/><soap:header message="tns:requesheader" part="id" use="literal"/><soap:header message="tns:requesheader" part="issue" use="literal"/><soap:header message="tns:requesheader" part="protocolVersion" use="literal"/></wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="OpiskelijanKaikkiTiedot">
       <soap:operation soapAction=""/>
-      <wsdl:input name="OpiskelijanKaikkiTiedotRequest">
+      <wsdl:input name="OpiskelijanKaikkiTiedot">
         <soap:body use="literal"/>
-      </wsdl:input>
+      <soap:header message="tns:requesheader" part="client" use="literal"/><soap:header message="tns:requesheader" part="service" use="literal"/><soap:header message="tns:requesheader" part="userId" use="literal"/><soap:header message="tns:requesheader" part="id" use="literal"/><soap:header message="tns:requesheader" part="issue" use="literal"/><soap:header message="tns:requesheader" part="protocolVersion" use="literal"/></wsdl:input>
       <wsdl:output name="OpiskelijanKaikkiTiedotResponse">
         <soap:body use="literal"/>
-      </wsdl:output>
+      <soap:header message="tns:requesheader" part="client" use="literal"/><soap:header message="tns:requesheader" part="service" use="literal"/><soap:header message="tns:requesheader" part="userId" use="literal"/><soap:header message="tns:requesheader" part="id" use="literal"/><soap:header message="tns:requesheader" part="issue" use="literal"/><soap:header message="tns:requesheader" part="protocolVersion" use="literal"/></wsdl:output>
     </wsdl:operation>
     <wsdl:operation name="LukukausiIlmoittautumiset">
       <soap:operation soapAction=""/>
-      <wsdl:input name="LukukausiIlmoittautumisetRequest">
+      <wsdl:input name="LukukausiIlmoittautumiset">
         <soap:body use="literal"/>
-      </wsdl:input>
+      <soap:header message="tns:requesheader" part="client" use="literal"/><soap:header message="tns:requesheader" part="service" use="literal"/><soap:header message="tns:requesheader" part="userId" use="literal"/><soap:header message="tns:requesheader" part="id" use="literal"/><soap:header message="tns:requesheader" part="issue" use="literal"/><soap:header message="tns:requesheader" part="protocolVersion" use="literal"/></wsdl:input>
       <wsdl:output name="LukukausiIlmoittautumisetResponse">
         <soap:body use="literal"/>
-      </wsdl:output>
+      <soap:header message="tns:requesheader" part="client" use="literal"/><soap:header message="tns:requesheader" part="service" use="literal"/><soap:header message="tns:requesheader" part="userId" use="literal"/><soap:header message="tns:requesheader" part="id" use="literal"/><soap:header message="tns:requesheader" part="issue" use="literal"/><soap:header message="tns:requesheader" part="protocolVersion" use="literal"/></wsdl:output>
     </wsdl:operation>
   </wsdl:binding>
   <wsdl:service name="OpiskelijanTiedotService">
     <wsdl:port binding="tns:OpiskelijanTiedotSoap11" name="OpiskelijanTiedotSoap11">
-      <soap:address location="http://virtawstesti.csc.fi:80/luku106/OpiskelijanTiedot"/>
+      <soap:address location="http://localhost:8080/ws"/>
     </wsdl:port>
   </wsdl:service>
 <wsdl:message name="requestheader"><wsdl:part element="xrd:client" name="client"/><wsdl:part element="xrd:service" name="service"/><wsdl:part element="xrd:userId" name="userId"/><wsdl:part element="xrd:id" name="id"/><wsdl:part element="xrd:issue" name="issue"/><wsdl:part element="xrd:protocolVersion" name="protocolVersion"/></wsdl:message></wsdl:definitions>

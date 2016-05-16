@@ -1,12 +1,10 @@
-package kapaVirtaAS;
+package com.gofore.kapaVirtaAS;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
-
-import static kapaVirtaAS.WSDLManipulator.generateVirtaKapaWSDL;
 
 /**
  * Created by joni on 9.5.2016.
@@ -22,7 +20,7 @@ public class Application extends SpringBootServletInitializer {
     }
 
     public static void main(String[] args) throws Exception {
-        generateVirtaKapaWSDL();
+        WSDLManipulator.generateVirtaKapaWSDL();
         SpringApplication.run(Application.class, args);
     }
 }
