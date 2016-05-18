@@ -44,7 +44,7 @@ public class WSDLManipulator {
                 = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
         Document doc = dBuilder.parse(inputFile);
-        doc.setXmlVersion("1.1");
+        doc.setXmlVersion("1.0");
         doc.getDocumentElement().normalize();
 
         // Manipulate WSDL to meet the requirements of xroad
@@ -103,12 +103,12 @@ public class WSDLManipulator {
                             // Append xroad wsdl:binding operation headers
                             if (child.getNodeName().contains("wsdl:input") || child.getNodeName().contains("wsdl:output")) {
                                 Element el = (Element) child;
-                                el.appendChild(soapHeader(doc.createElement("soap:header"), "tns:requesheader", "client", "literal"));
-                                el.appendChild(soapHeader(doc.createElement("soap:header"), "tns:requesheader", "service", "literal"));
-                                el.appendChild(soapHeader(doc.createElement("soap:header"), "tns:requesheader", "userId", "literal"));
-                                el.appendChild(soapHeader(doc.createElement("soap:header"), "tns:requesheader", "id", "literal"));
-                                el.appendChild(soapHeader(doc.createElement("soap:header"), "tns:requesheader", "issue", "literal"));
-                                el.appendChild(soapHeader(doc.createElement("soap:header"), "tns:requesheader", "protocolVersion", "literal"));
+                                el.appendChild(soapHeader(doc.createElement("soap:header"), "tns:requestheader", "client", "literal"));
+                                el.appendChild(soapHeader(doc.createElement("soap:header"), "tns:requestheader", "service", "literal"));
+                                el.appendChild(soapHeader(doc.createElement("soap:header"), "tns:requestheader", "userId", "literal"));
+                                el.appendChild(soapHeader(doc.createElement("soap:header"), "tns:requestheader", "id", "literal"));
+                                el.appendChild(soapHeader(doc.createElement("soap:header"), "tns:requestheader", "issue", "literal"));
+                                el.appendChild(soapHeader(doc.createElement("soap:header"), "tns:requestheader", "protocolVersion", "literal"));
                             }
 
                             if (child.getNodeName().contains("wsdl:input")) {
