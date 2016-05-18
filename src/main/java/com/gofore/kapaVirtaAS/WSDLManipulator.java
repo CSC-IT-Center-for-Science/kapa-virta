@@ -23,6 +23,9 @@ public class WSDLManipulator {
     private static final String xroadSchema = "xrd";
     private static final String[] xroadReqHeaders = {"client", "service", "userId", "id", "issue", "protocolVersion"};
     private static final String soapServiceURL = "http://localhost:8080/ws";
+    private static final String xroadImportId = "xrd";
+    private static final String xroadImportUrl = "http://x-road.eu/xsd/xroad.xsd";
+
 
     public static Element replaceAttribute(Element el, String attributeName, String newValue) {
         el.removeAttribute(attributeName);
@@ -60,14 +63,29 @@ public class WSDLManipulator {
 
         // Schema elements <xs:schema> attribute manipulations
         NodeList schemas = root.getElementsByTagName("xs:schema");
+
         for(int i = 0; i < schemas.getLength(); ++i){
             Node schema = schemas.item(i);
             if(schema != null){
                 NamedNodeMap schemaAttributes = schema.getAttributes();
-                if(schemaAttributes != null && schemaAttributes.getNamedItem("xmlns:virtaluku") != null){
+                if(schemaAttributes != null && schemaAttributes.getNamedItem("xmlns:virtaluku") != null) {
                     schemaAttributes.getNamedItem("xmlns:virtaluku").setTextContent(serviceName);
-                    if(schemaAttributes != null && schemaAttributes.getNamedItem("targetNamespace") != null){
+                    if (schemaAttributes != null && schemaAttributes.getNamedItem("targetNamespace") != null) {
                         schemaAttributes.getNamedItem("targetNamespace").setTextContent(serviceName);
+                    }
+                    Element el = (Element) schema.appendChild(doc.createElement("xs:import"));
+                    el.setAttribute("id", xroadImportId);
+                    el.setAttribute("namespace", xroadImportUrl);
+                    el.setAttribute("schemaLocation", xroadImportUrl);
+
+                    // Remove Request part from xs:element -elements
+                    NodeList elementsInSchema = schema.getChildNodes();
+                    for(int j = 0; j < elementsInSchema.getLength(); ++j) {
+                        Element el1 = (Element) elementsInSchema.item(j);
+                        if (el1.getNodeName() == "xs:element") {
+                            replaceAttribute(el1, "name", StringUtils.substringBefore(el1.getAttribute("name"), "Request"));
+                        }
+
                     }
                 }
             }
@@ -118,6 +136,11 @@ public class WSDLManipulator {
                         }
                     }
                 }
+            // Remove Request from wsdl:message > wsdl:part element so that can see element
+            } else if (childrenList.item(i).getNodeName().contains("wsdl:message")
+                    && childrenList.item(i).getAttributes().getNamedItem("name").getNodeValue().contains("Request")) {
+                Element part = (Element) childrenList.item(i).getFirstChild().getNextSibling();
+                replaceAttribute(part, "element", StringUtils.substringBefore(part.getAttribute("element"), "Request"));
             }
 
             // Change wsdl input names to meet XRoad standard
