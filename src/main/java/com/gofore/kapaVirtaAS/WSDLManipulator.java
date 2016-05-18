@@ -95,6 +95,9 @@ public class WSDLManipulator {
                 NodeList binding = childrenList.item(i).getChildNodes();
                 for (int j = 0; j < binding.getLength(); ++j) {
                     if (binding.item(j).getNodeName().contains("wsdl:operation")) {
+                        Element el1 = (Element) binding.item(j).appendChild(doc.createElement("id:version"));
+                        el1.setTextContent("v1");
+
                         for (Node child = binding.item(j).getFirstChild(); child != null; child = child.getNextSibling()) {
 
                             // Append xroad wsdl:binding operation headers
@@ -109,7 +112,7 @@ public class WSDLManipulator {
                             }
 
                             if (child.getNodeName().contains("wsdl:input")) {
-                                Element el = (Element) child;
+                                Element  el = (Element) child;
                                 replaceAttribute(el, "name", StringUtils.substringBefore(el.getAttribute("name"), "Request"));
                             }
                         }
