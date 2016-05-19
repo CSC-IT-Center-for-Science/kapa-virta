@@ -107,7 +107,7 @@
                 </executions>
             </plugin>
 
-            <!-- Virta WSDL to JAVA -->
+            <!-- Virta WSDL to JAVA
             <plugin>
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
                 <artifactId>maven-jaxb2-plugin</artifactId>
@@ -135,9 +135,9 @@
                         </schema>
                     </schemas>
                 </configuration>
-            </plugin>
+            </plugin> -->
 
-            <!-- KapaVirta WSDL to JAVA -->
+            <!-- KapaVirta WSDL to JAVA
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
@@ -170,7 +170,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
         </plugins>
     </build>
 </project>

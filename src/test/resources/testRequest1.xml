@@ -1,0 +1,32 @@
+<x:Envelope xmlns:x="http://schemas.xmlsoap.org/soap/envelope/"
+            xmlns:xro="http://x-road.eu/xsd/xroad.xsd"
+            xmlns:id="http://x-road.eu/xsd/identifiers">
+    <x:Header>
+        <xrd:client id:objectType="SUBSYSTEM">
+            <id:xRoadInstance>FI</id:xRoadInstance>
+            <id:memberClass>ORG</id:memberClass>
+            <id:memberCode>12345-6</id:memberCode>
+            <id:subsystemCode>ConsumerService</id:subsystemCode>
+        </xrd:client>
+        <xro:service>
+            <id:serviceCode>opintosuoritukset</id:serviceCode>
+        </xro:service>
+        <xro:userId>abcd</xro:userId>
+        <xro:id>efgh</xro:id>
+        <xro:issue>jees</xro:issue>
+        <xro:protocolVersion>6</xro:protocolVersion>
+    </x:Header>
+    <x:Body>
+        <pro:Opintosuoritukset xmlns:pro="http://test.x-road.virta.csc.fi/producer">
+            <pro:Kutsuja>
+                <pro:jarjestelma/>
+                <pro:tunnus/>
+                <pro:avain>salaisuus</pro:avain>
+            </pro:Kutsuja>
+            <pro:Hakuehdot>
+                <pro:kansallinenOppijanumero>aed09afd87a8c6d76b76bbd</pro:kansallinenOppijanumero>
+                <pro:organisaatio>00001</pro:organisaatio>
+            </pro:Hakuehdot>
+        </pro:Opintosuoritukset>
+    </x:Body>
+</x:Envelope>

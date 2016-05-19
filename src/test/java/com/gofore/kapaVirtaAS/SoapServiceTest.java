@@ -10,8 +10,10 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
-import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
@@ -26,67 +28,57 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 public class SoapServiceTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
-
     private MockMvc mockMvc;
 
-    private final String testRequest1 =
-            "<x:Envelope xmlns:x=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
-                "xmlns:pro=\"http://test.x-road.virta.csc.fi/producer\" " +
-                    "xmlns:xro=\"http://x-road.eu/xsd/xroad.xsd\">\n" +
-            "    <x:Header>\n" +
-            "        <xro:client/>\n" +
-            "        <xro:service/>\n" +
-            "        <xro:userId>ok</xro:userId>\n" +
-            "        <xro:id>ok</xro:id>\n" +
-            "        <xro:issue>ok</xro:issue>\n" +
-            "        <xro:protocolVersion>6</xro:protocolVersion>\n" +
-            "    </x:Header>\n" +
-            "    <x:Body>\n" +
-            "        <pro:Tutkinnot>\n" +
-            "            <pro:Kutsuja>\n" +
-            "                <pro:jarjestelma/>\n" +
-            "                <pro:tunnus/>\n" +
-            "                <pro:avain>salaisuus</pro:avain>\n" +
-            "            </pro:Kutsuja>\n" +
-            "            <pro:Hakuehdot>\n" +
-            "                <pro:kansallinenOppijanumero>aed09afd87a8c6d76b76bbd</pro:kansallinenOppijanumero>\n" +
-            "                <pro:organisaatio>00001</pro:organisaatio>\n" +
-            "            </pro:Hakuehdot>\n" +
-            "        </pro:Tutkinnot>\n" +
-            "    </x:Body>\n" +
-            "</x:Envelope>";
-    private final String testResponseHeaders1 =
-            "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">"+
-            "   <SOAP-ENV:Header xmlns:xro=\"http://x-road.eu/xsd/xroad.xsd\">\n" +
-            "        <xro:client/>\n" +
-            "        <xro:service/>\n" +
-            "        <xro:userId>ok</xro:userId>\n" +
-            "        <xro:id>ok</xro:id>\n" +
-            "        <xro:issue>ok</xro:issue>\n" +
-            "        <xro:protocolVersion>6</xro:protocolVersion>\n" +
-            "   </SOAP-ENV:Header>" +
-            "   <SOAP-ENV:Body>" +
-            "       <virtaluku:TutkinnotResponse xmlns:virtaluku=\"http://test.x-road.virta.csc.fi/producer\">" +
-            "           <virta:Opintosuoritukset xmlns:virta=\"urn:mace:funet.fi:virta/2015/09/01\"/>" +
-            "       </virtaluku:TutkinnotResponse>" +
-            "       <pro:Tutkinnot/>" +
-            "   </SOAP-ENV:Body>" +
-            "</SOAP-ENV:Envelope>";
+    private String testReq1;
 
     @Before
     public void setup() throws Exception {
         this.mockMvc = webAppContextSetup(webApplicationContext).build();
+
+        this.testReq1 = readFile("src/test/resources/testRequest1.xml");
     }
 
     @Test
-    public void testResponseXRoadHeaders() throws Exception {
-        mockMvc.perform(post("/ws/").content(testRequest1))
+    public void testResponseSoapHeaders() throws Exception {
+        mockMvc.perform(post("/ws/").content(testReq1))
             .andExpect(status().isOk())
                 .andExpect(xpath("//*[local-name()='client']").exists())
+                .andExpect(xpath("//*[local-name()='xRoadInstance']").exists())
+                .andExpect(xpath("//*[local-name()='memberClass']").exists())
+                .andExpect(xpath("//*[local-name()='memberCode']").exists())
+                .andExpect(xpath("//*[local-name()='subsystemCode']").exists())
                 .andExpect(xpath("//*[local-name()='service']").exists())
+                .andExpect(xpath("//*[local-name()='serviceCode']").exists())
                 .andExpect(xpath("//*[local-name()='userId']").exists())
                 .andExpect(xpath("//*[local-name()='id']").exists())
                 .andExpect(xpath("//*[local-name()='issue']").exists())
                 .andExpect(xpath("//*[local-name()='protocolVersion']").exists());
+    }
+
+    @Test
+    public void testResponseSoapBody() throws Exception {
+        mockMvc.perform(post("/ws/").content(testReq1))
+                .andExpect(status().isOk())
+                .andExpect(xpath("//*[local-name()='Opintosuoritukset']").exists())
+                .andExpect(xpath("//*[local-name()='OpintosuorituksetResponse']").exists());
+    }
+
+    private String readFile(String filename) throws Exception {
+        String content = null;
+        File file = new File(filename); //for ex foo.txt
+        FileReader reader = null;
+        try {
+            reader = new FileReader(file);
+            char[] chars = new char[(int) file.length()];
+            reader.read(chars);
+            content = new String(chars);
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if(reader !=null){reader.close();}
+        }
+        return content;
     }
 }

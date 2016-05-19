@@ -23,10 +23,12 @@ public class SOAPMessageTransformer {
     private final String ASserviceURI = "http://test.x-road.virta.csc.fi/producer";
     private final String virtaServiceURI = "http://tietovaranto.csc.fi/luku";
     private final String xroadSchemaURI = "http://x-road.eu/xsd/xroad.xsd";
+    private final String xroadIdSchemaURI = "http://x-road.eu/xsd/identifiers";
     private String xroadSchemaPrefix;
-    private String virtaServicePrefix;
-    private Node XRoadHeaderElement;
-    private Node XRoadRequestBody;
+    private String xroadIdSchemaPrefix;
+    private String virtaServicePrefix = "xmlns:virtaluku";
+    private Node xroadHeaderElement;
+    private Node xroadRequestBody;
 
     public enum MessageDirection {
         XRoadToVirta,
@@ -39,7 +41,8 @@ public class SOAPMessageTransformer {
     public String transform(String message, MessageDirection direction) throws Exception {
         DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document doc = dBuilder.parse(new InputSource(new ByteArrayInputStream(stripXmlDefinition(message).getBytes())));
-        doc.setXmlVersion("1.1");
+        doc.setXmlVersion("1.0");
+        doc.normalizeDocument();
         Element root = doc.getDocumentElement();
 
         // Save XRoad schema prefix for response message
@@ -51,6 +54,20 @@ public class SOAPMessageTransformer {
                         xroadSchemaURI.equals(rootAttributes.item(i).getNodeValue())) {
                     xroadSchemaPrefix = rootAttributes.item(i).getNodeName();
                 }
+                if (rootAttributes.item(i) != null &&
+                        rootAttributes.item(i).getNodeName() != null &&
+                        xroadIdSchemaURI.equals(rootAttributes.item(i).getNodeValue())) {
+                    xroadIdSchemaPrefix = rootAttributes.item(i).getNodeName();
+                }
+            }
+        }
+        // Add XRoad schemas with saved prefix to response message
+        if (direction == MessageDirection.VirtaToXRoad) {
+            if(xroadSchemaURI != null && xroadSchemaPrefix != null) {
+                root.setAttribute(xroadSchemaPrefix, xroadSchemaURI);
+            }
+            if(xroadIdSchemaURI != null && xroadIdSchemaPrefix != null) {
+                root.setAttribute(xroadIdSchemaPrefix, xroadIdSchemaURI);
             }
         }
 
@@ -63,6 +80,10 @@ public class SOAPMessageTransformer {
                     attribute.getNodeValue().contains(ASserviceURI)) {
                 attribute.setNodeValue(virtaServiceURI);
             }
+            if (direction == MessageDirection.VirtaToXRoad &&
+                    attribute.getNodeValue().contains(ASserviceURI)) {
+
+            }
         }
 
         //There should be two children under the root node: header and body
@@ -74,19 +95,17 @@ public class SOAPMessageTransformer {
             if (child != null && child.getNodeName().toLowerCase().contains("header")) {
                 if (direction == MessageDirection.XRoadToVirta) {
                     //Save XRoadHeaderElement for response message
-                    this.XRoadHeaderElement = child.cloneNode(true);
+                    this.xroadHeaderElement = child.cloneNode(true);
+
+                    //Strip XRoad SOAP-headers for Virta
                     //Replace SOAP-headers with same element without children
-                    root.replaceChild(child.cloneNode(false), child);
+                    root.replaceChild(children.item(i).cloneNode(false), children.item(i));
                 }
 
-                if (direction == MessageDirection.VirtaToXRoad && this.XRoadHeaderElement != null) {
-                    // Add XRoad schemas with saved prefix to response message
-                    Element el = (Element) child;
-                    el.setAttribute(xroadSchemaPrefix, xroadSchemaURI);
-
+                if (direction == MessageDirection.VirtaToXRoad && this.xroadHeaderElement != null) {
                     //Append XRoad SOAP-headers back
-                    for (int j = 0; j < this.XRoadHeaderElement.getChildNodes().getLength(); ++j) {
-                        child.appendChild(doc.importNode(this.XRoadHeaderElement.getChildNodes().item(j), true));
+                    for (int j = 0; j < this.xroadHeaderElement.getChildNodes().getLength(); ++j) {
+                        child.appendChild(doc.importNode(this.xroadHeaderElement.getChildNodes().item(j), true));
                     }
                 }
             }
@@ -98,34 +117,36 @@ public class SOAPMessageTransformer {
                     if (bodyNode.getNodeType() == Node.ELEMENT_NODE) {
                         Element soapOperationElement = (Element) bodyNode;
                         if (direction == MessageDirection.XRoadToVirta) {
+                            //Save XRoadRequestBody for response message
+                            xroadRequestBody = soapOperationElement.cloneNode(true);
+
                             //Add postfix after SOAP-operation name
                             //eg. Opintosuoritukset -> OpintosuorituksetRequest
                             doc.renameNode(soapOperationElement, virtaServiceURI, soapOperationElement.getTagName() + "Request");
 
-                            //Save XRoadRequestBody for response message
-                            XRoadRequestBody = soapOperationElement;
+                            String namespace = "pro";
+                            soapOperationElement.removeAttributeNS(namespace, ASserviceURI);
+                            soapOperationElement.setAttribute(namespace, virtaServiceURI);
                         }
 
                         if (direction == MessageDirection.VirtaToXRoad) {
-                            //Remove Request appendix to operation input name
-                            //eg. OpintosuorituksetRequest -> Opintosuoritukset
-                            String tagNameForXRoad = StringUtils.substringBefore(soapOperationElement.getTagName(), "Request");
-                            //Rename tag with XRoad naming conventions
-                            doc.renameNode(soapOperationElement, ASserviceURI, tagNameForXRoad);
-
-                            //Save Virta service schema uri
-                            virtaServicePrefix = StringUtils.substringBefore(soapOperationElement.getTagName(), ":");
+                            //Response part namespace change
+                            soapOperationElement.removeAttribute(virtaServicePrefix);
+                            soapOperationElement.setAttribute(virtaServicePrefix,ASserviceURI);
                         }
                     }
                 }
-                //Append XRoadRequestBody to response message body
+
+                //Add request body in SOAP-body (optional in XRoad)
+                /*  need to change schema
                 if (direction == MessageDirection.VirtaToXRoad) {
-                    child.appendChild(doc.importNode(XRoadRequestBody, true));
-                    //doc.renameNode(child, virtaServiceURI, )
-                }
+                    Node request = child.appendChild(doc.importNode(xroadRequestBody, true));
+                    //doc.renameNode(request, virtaServiceURI, soapOperationElement.getTagName());
+                }*/
             }
         }
 
+        doc.normalizeDocument();
         DOMSource domSource = new DOMSource(doc);
         StringWriter writer = new StringWriter();
         StreamResult result = new StreamResult(writer);

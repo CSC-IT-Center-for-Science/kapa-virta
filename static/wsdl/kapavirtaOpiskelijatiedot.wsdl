@@ -7,11 +7,13 @@
                   targetNamespace="http://test.x-road.virta.csc.fi/producer">
     <wsdl:types>
         <xs:schema xmlns:virta="urn:mace:funet.fi:virta/2015/09/01" xmlns:virtaluku="http://test.x-road.virta.csc.fi/producer"
+                   xmlns:id="http://x-road.eu/xsd/identifiers"
                    xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified"
                    elementFormDefault="qualified" targetNamespace="http://test.x-road.virta.csc.fi/producer">
             <xs:import namespace="urn:mace:funet.fi:virta/2015/09/01"/>
             <!-- Import X-Road schema -->
             <xs:import id="xrd" namespace="http://x-road.eu/xsd/xroad.xsd" schemaLocation="http://x-road.eu/xsd/xroad.xsd"/>
+            <xs:import id="id" namespace="http://x-road.eu/xsd/identifiers" schemaLocation="http://x-road.eu/xsd/identifiers"/>
             <xs:complexType name="Kutsuja">
                 <xs:sequence>
                     <xs:element name="jarjestelma">
