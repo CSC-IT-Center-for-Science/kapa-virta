@@ -1,4 +1,4 @@
-package com.gofore.kapaVirtaAS;
+package fi.csc.kapaVirtaAS;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -85,7 +85,7 @@ public class SoapServiceTest {
 
     private String readFile(String filename) throws Exception {
         String content = null;
-        File file = new File(filename); //for ex foo.txt
+        File file = new File(filename);
         FileReader reader = null;
         try {
             reader = new FileReader(file);
@@ -93,10 +93,11 @@ public class SoapServiceTest {
             reader.read(chars);
             content = new String(chars);
             reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if(reader !=null){reader.close();}
+        }
+        finally {
+            if(reader != null){
+                reader.close();
+            }
         }
         return content;
     }

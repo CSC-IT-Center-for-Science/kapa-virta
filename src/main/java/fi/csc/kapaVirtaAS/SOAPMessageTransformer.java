@@ -1,4 +1,4 @@
-package com.gofore.kapaVirtaAS;
+package fi.csc.kapaVirtaAS;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -112,7 +112,7 @@ public class SOAPMessageTransformer {
             if (child != null && child.getNodeName().toLowerCase().contains("body")) {
                 for (Node bodyNode = child.getFirstChild(); bodyNode != null; bodyNode = bodyNode.getNextSibling()) {
                     //Change request appendix to operation input name
-                    if (bodyNode.getNodeType() == Node.ELEMENT_NODE) {
+                    if (bodyNode.getNodeType() == Node.ELEMENT_NODE && !bodyNode.getNodeName().toLowerCase().contains("fault")) {
                         Element soapOperationElement = (Element) bodyNode;
                         if (direction == MessageDirection.XRoadToVirta) {
                             //Save XRoadRequestBody for response message

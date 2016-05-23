@@ -1,4 +1,4 @@
-package com.gofore.kapaVirtaAS;
+package fi.csc.kapaVirtaAS;
 
 /**
  * Created by joni on 10.5.2016.

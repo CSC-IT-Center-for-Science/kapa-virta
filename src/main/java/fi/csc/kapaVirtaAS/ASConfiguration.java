@@ -1,5 +1,8 @@
-package com.gofore.kapaVirtaAS;
+package fi.csc.kapaVirtaAS;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.oxm.ValidationFailureException;
 import org.w3c.dom.Element;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -12,6 +15,7 @@ import java.util.List;
  * Created by joni on 23.5.2016.
  */
 public class ASConfiguration {
+    private static final Logger log = LoggerFactory.getLogger(ASConfiguration.class);
     private static final String confFileName = "adapterServiceConf.xml";
 
     private final List<String> xroadHeaders;
@@ -26,10 +30,26 @@ public class ASConfiguration {
     private final String virtaServiceSchema;
 
     public ASConfiguration() throws Exception {
-        File inputFile = new File("../"+ confFileName);
-        if(inputFile.canRead() == false){
+        File inputFile = new File("../" + confFileName);
+        if (inputFile.canRead() == false) {
             //For developing environment
-            inputFile = new File("target/"+ confFileName);
+            inputFile = new File("target/" + confFileName);
+        }
+        else{
+            log.info("Config file found from path: ../");
+        }
+        if (inputFile.canRead() == false) {
+            //For tomcat environment
+            inputFile = new File("webapps/" + confFileName);
+        }
+        else{
+            log.info("Config file found from path: target/");
+        }
+        if(inputFile.canRead() == true){
+            log.info("Config file found from path: webapps/");
+        }
+        else{
+            throw new Exception("Could not find config file.");
         }
 
         DocumentBuilderFactory dbFactory

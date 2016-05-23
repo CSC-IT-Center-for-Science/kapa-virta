@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.springframework</groupId>
+    <groupId>fi.csc</groupId>
     <artifactId>kapa-virta</artifactId>
     <version>0.1.0</version>
 
@@ -13,7 +13,7 @@
         <java.version>1.8</java.version>
         <cxf.version>3.1.6</cxf.version>
         <springboot.version>1.3.5.RELEASE</springboot.version>
-        <!--start-class>Application.class</start-class-->
+        <start-class>fi.csc.kapaVirtaAS.Application</start-class>
     </properties>
 
     <parent>
@@ -30,9 +30,8 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <artifactId>spring-boot-starter</artifactId>
             <version>${springboot.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -57,7 +56,7 @@
     </dependencies>
 
     <build>
-        <finalName>kapaVirtaAs</finalName>
+        <finalName>kapavirta_as</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -111,4 +110,17 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>tomcat</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-tomcat</artifactId>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>
