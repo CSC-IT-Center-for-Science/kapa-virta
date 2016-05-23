@@ -15,6 +15,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
@@ -62,6 +63,13 @@ public class SoapServiceTest {
                 .andExpect(status().isOk())
                 .andExpect(xpath("//*[local-name()='Opintosuoritukset']").exists())
                 .andExpect(xpath("//*[local-name()='OpintosuorituksetResponse']").exists());
+    }
+
+    @Test
+    public void testResponseContentType() throws  Exception {
+        mockMvc.perform(post("/ws/").content(testReq1))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("text/xml"));
     }
 
     private String readFile(String filename) throws Exception {
