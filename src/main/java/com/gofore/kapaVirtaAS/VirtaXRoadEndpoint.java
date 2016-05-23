@@ -4,6 +4,10 @@ import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,8 +28,8 @@ public class VirtaXRoadEndpoint {
     private final String ERROR_MESSAGE = "XRoad-Virta adapterservice encountered internal server error";
 
     @RequestMapping(value="/ws", method= RequestMethod.POST)
-    public String getVirtaResponse(@RequestBody String XRoadRequestMessage, HttpServletResponse response) throws Exception{
-        SOAPMessageTransformer messageTransformer = new SOAPMessageTransformer();
+    public ResponseEntity<String> getVirtaResponse(@RequestBody String XRoadRequestMessage) throws Exception{
+        SOAPMessageTransformer messageTransformer = new SOAPMessageTransformer(new ASConfiguration());
         VirtaClient virtaClient = new VirtaClient();
 
         //Transform SOAP-request to Virta
@@ -42,8 +46,7 @@ public class VirtaXRoadEndpoint {
         //Send transformed SOAP-request to Virta
         HttpResponse virtaResponse = virtaClient.getVirtaWS(virtaRequestMessage);
         if(virtaResponse == null){
-            response.setStatus(500);
-            return ERROR_MESSAGE;
+            new ResponseEntity<>("Error", new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         //Exctract response message
@@ -76,18 +79,20 @@ public class VirtaXRoadEndpoint {
         //Validate transformed SOAP-response
         if(!validateXRoadResponse(XRoadResponseMessage)){
             log.error("Validate failed");
-            response.setStatus(500);
-            return "XRoad-Virta adaterservice encountered internal server error";
+            return new ResponseEntity<>("XRoad-Virta adaterservice encountered internal server error",
+                    new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        // Set HTTP-headers to SOAP-response
+        /* Set HTTP-headers to SOAP-response
         for(Header virtaHeader : virtaResponse.getAllHeaders()){
             if(Arrays.asList(headersToCopy).contains(virtaHeader.getName())){
                 response.setHeader(virtaHeader.getName(), virtaHeader.getValue());
             }
-        }
+        }*/
 
-        return XRoadResponseMessage;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.TEXT_XML);
+        return new ResponseEntity<>(XRoadResponseMessage, headers, HttpStatus.OK);
     }
 
     private static boolean validateXRoadResponse(String XRoadResponse){

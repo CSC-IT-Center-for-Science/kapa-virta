@@ -20,7 +20,8 @@ public class Application extends SpringBootServletInitializer {
     }
 
     public static void main(String[] args) throws Exception {
-        WSDLManipulator.generateVirtaKapaWSDL();
+        WSDLManipulator wsdlManipulator = new WSDLManipulator(new ASConfiguration());
+        wsdlManipulator.generateVirtaKapaWSDL();
         SpringApplication.run(Application.class, args);
     }
 }

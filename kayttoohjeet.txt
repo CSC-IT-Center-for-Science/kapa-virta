@@ -1,0 +1,27 @@
+Asennus ja käyttöohjeet - Kapa-Virta sovitinpalvelimelle:
+
+Yleistä:
+-Toteutettu Java8:lla
+-Buildin teko tapahtuu Mavenilla
+-Sovelluspalvelin toimii SpringBootilla ilman erillistä sovelluspalvelinta (Springbootin sisäinen tomcat) 
+ TAI .war tiedostona sovelluspalvelimessa, kuten Tomcatissa (Vähintään Tomcat 7.0, koska vaaditaan Servlet 3.0 tuki)
+-Springboot käynnistys komennolla: mvn spring-boot:run
+-.war paketin luonti target/ -kansioon komennolla: mvn package
+-Molemmissa tapauksissa target/ -kansioon luodaan adapterServiceConf.xml tiedosto johon tulee asettaa oikeat konfiguraatiot
+
+
+Konfiguraatiotiedosto:
+-.war tiedostoa ajettaessa adapterServiceConf.xml tiedoston tulee olla samassa kansiossa .war tiedoston kanssa
+-Konfiguraatio on jaettu kolmeen lohkoon: xroad, adapterService ja virta:
+
+-->> xroad sisältää kansallisen palveluväylän konfiguraatiot ja niitä ei yleensä tarvitse muuttaa
+
+-->> adapterService sisältää tämän sovitinpalvelimen konfiguraatiot ja ne täytyy asettaa oikeaksi
+->adapterServiceSchema: Haluttu url tämän sovitinpalvelimen skeemaksi. Skeemassa täytyy olla lopussa sama polku kuin virran skeemassa esim. /luku
+->adapterServiceSOAPURL: Tämän liityntäpalvelimen osoite, johon xroad liityntäpalvelin ojaa xroadilta tulevat SOAP viestit. Springboottia käytettäessä portti on 8080.
+
+-->> virta sisältää virta tietovarannon tai sen testiympäristön konfiguraatiot
+->virtaWSDLURL: Osoite josta virra wsdl kuvaus on saatavilla
+->virtaServiceSchema: Virran käyttämä skeeman URL pyyntö- ja vastaustyypeille. (Esim. versiossa 1.06: http://tietovaranto.csc.fi/luku)
+->virtaVersionIdForXRoad: XRoadin vaatima versionumero Virran palveluista, joka näkyy XRoadin käyttäjille.
+

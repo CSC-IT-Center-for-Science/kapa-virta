@@ -2,12 +2,12 @@
             xmlns:xro="http://x-road.eu/xsd/xroad.xsd"
             xmlns:id="http://x-road.eu/xsd/identifiers">
     <x:Header>
-        <xrd:client id:objectType="SUBSYSTEM">
+        <xro:client id:objectType="SUBSYSTEM">
             <id:xRoadInstance>FI</id:xRoadInstance>
             <id:memberClass>ORG</id:memberClass>
             <id:memberCode>12345-6</id:memberCode>
             <id:subsystemCode>ConsumerService</id:subsystemCode>
-        </xrd:client>
+        </xro:client>
         <xro:service>
             <id:serviceCode>opintosuoritukset</id:serviceCode>
         </xro:service>

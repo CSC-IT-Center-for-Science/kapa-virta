@@ -1,0 +1,25 @@
+<configuration>
+    <xroad>
+        <xroadHeaders>
+            <header>client</header>
+            <header>service</header>
+            <header>userId</header>
+            <header>id</header>
+            <header>issue</header>
+            <header>protocolVersion</header>
+        </xroadHeaders>
+        <xroadSchema>http://x-road.eu/xsd/xroad.xsd</xroadSchema>
+        <xroadIdSchema>http://x-road.eu/xsd/identifiers</xroadIdSchema>
+        <xroadSchemaPrefixForWSDL>xrd</xroadSchemaPrefixForWSDL>
+        <xroadIdSchemaPrefixForWSDL>id</xroadIdSchemaPrefixForWSDL>
+    </xroad>
+    <adapterService>
+        <adapterServiceSchema>http://test.x-road.virta.csc.fi/luku</adapterServiceSchema>
+        <adapterServiceSOAPURL>http://localhost:8080/ws</adapterServiceSOAPURL>
+    </adapterService>
+    <virta>
+        <virtaWSDLURL>http://virtawstesti.csc.fi/luku106/opiskelijatiedot.wsdl</virtaWSDLURL>
+        <virtaServiceSchema>http://tietovaranto.csc.fi/luku</virtaServiceSchema>
+        <virtaVersionForXRoad>v1</virtaVersionForXRoad>
+    </virta>
+</configuration>

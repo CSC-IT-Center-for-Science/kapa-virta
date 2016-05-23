@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:id="http://x-road.eu/xsd/identifiers" xmlns:sch0="http://tietovaranto.csc.fi/luku" xmlns:sch1="urn:mace:funet.fi:virta/2015/09/01" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://test.x-road.virta.csc.fi/producer" xmlns:xrd="http://x-road.eu/xsd/xroad.xsd" targetNamespace="http://test.x-road.virta.csc.fi/producer">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:id="http://x-road.eu/xsd/identifiers" xmlns:sch0="http://tietovaranto.csc.fi/luku" xmlns:sch1="urn:mace:funet.fi:virta/2015/09/01" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://test.x-road.virta.csc.fi/luku" xmlns:xrd="http://x-road.eu/xsd/xroad.xsd" targetNamespace="http://test.x-road.virta.csc.fi/luku">
   <wsdl:types>
-    <xs:schema xmlns:virta="urn:mace:funet.fi:virta/2015/09/01" xmlns:virtaluku="http://test.x-road.virta.csc.fi/producer" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://test.x-road.virta.csc.fi/producer"><xs:import namespace="urn:mace:funet.fi:virta/2015/09/01"/><xs:complexType name="Kutsuja"><xs:sequence><xs:element name="jarjestelma"><xs:annotation><xs:documentation xml:lang="fi">
+    <xs:schema xmlns:virta="urn:mace:funet.fi:virta/2015/09/01" xmlns:virtaluku="http://test.x-road.virta.csc.fi/luku" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://test.x-road.virta.csc.fi/luku"><xs:import namespace="urn:mace:funet.fi:virta/2015/09/01"/><xs:complexType name="Kutsuja"><xs:sequence><xs:element name="jarjestelma"><xs:annotation><xs:documentation xml:lang="fi">
             Lukurajapintaa käyttävän eli kutsuvan järjestelmän nimi (esim. TIPTOP).
           </xs:documentation><xs:documentation xml:lang="en">
             Name of the system using the interface (e.g. TIPTOP).
@@ -12,7 +12,7 @@
           	Lukurajapinnan salasana.
           </xs:documentation><xs:documentation xml:lang="en">
           	Interface password.
-          </xs:documentation></xs:annotation><xs:simpleType><xs:restriction base="xs:string"><xs:maxLength value="100"/></xs:restriction></xs:simpleType></xs:element></xs:sequence></xs:complexType><xs:element name="organisaatio" type="virta:OrganisaatioKoodiTyyppi"/><xs:complexType name="HakuEhdot"><xs:choice><xs:element name="henkilotunnus" type="virta:HenkilotunnusTyyppi"/><xs:element name="kansallinenOppijanumero" type="xs:string"/></xs:choice></xs:complexType><xs:complexType name="HakuEhdotOrganisaatioVapaa"><xs:complexContent><xs:extension base="virtaluku:HakuEhdot"><xs:sequence><xs:element minOccurs="0" ref="virtaluku:organisaatio"/></xs:sequence></xs:extension></xs:complexContent></xs:complexType><xs:group name="PerusRequest"><xs:sequence><xs:element name="Kutsuja" type="virtaluku:Kutsuja"/><xs:element name="Hakuehdot" type="virtaluku:HakuEhdotOrganisaatioVapaa"/></xs:sequence></xs:group><xs:element name="OpiskelijanKaikkiTiedotRequest"><xs:complexType><xs:group ref="virtaluku:PerusRequest"/></xs:complexType></xs:element><xs:element name="OpiskelijanKaikkiTiedotResponse"><xs:complexType><xs:sequence><xs:element ref="virta:Virta"/></xs:sequence></xs:complexType></xs:element><xs:element name="OpintosuorituksetRequest"><xs:complexType><xs:group ref="virtaluku:PerusRequest"/></xs:complexType></xs:element><xs:element name="OpintosuorituksetResponse"><xs:complexType><xs:sequence><xs:element ref="virta:Opintosuoritukset"/></xs:sequence></xs:complexType></xs:element><xs:element name="TutkinnotRequest"><xs:complexType><xs:group ref="virtaluku:PerusRequest"/></xs:complexType></xs:element><xs:element name="TutkinnotResponse"><xs:complexType><xs:sequence><xs:element ref="virta:Opintosuoritukset"/></xs:sequence></xs:complexType></xs:element><xs:element name="LukukausiIlmoittautumisetRequest"><xs:complexType><xs:group ref="virtaluku:PerusRequest"/></xs:complexType></xs:element><xs:element name="LukukausiIlmoittautumisetResponse"><xs:complexType><xs:sequence><xs:element ref="virta:LukukausiIlmoittautumiset"/></xs:sequence></xs:complexType></xs:element><xs:element name="OpiskeluoikeudetRequest"><xs:complexType><xs:group ref="virtaluku:PerusRequest"/></xs:complexType></xs:element><xs:element name="OpiskeluoikeudetResponse"><xs:complexType><xs:sequence><xs:element ref="virta:Opiskeluoikeudet"/></xs:sequence></xs:complexType></xs:element><xs:element name="OpiskelijanTiedotRequest"><xs:complexType><xs:sequence><xs:element name="Kutsuja" type="virtaluku:Kutsuja"/><xs:element name="Hakuehdot"><xs:complexType><xs:complexContent><xs:extension base="virtaluku:HakuEhdot"><xs:sequence><xs:element ref="virtaluku:organisaatio"/></xs:sequence></xs:extension></xs:complexContent></xs:complexType></xs:element></xs:sequence></xs:complexType></xs:element><xs:element name="OpiskelijanTiedotResponse"><xs:complexType><xs:sequence><xs:element ref="virta:Opiskelijat"/></xs:sequence></xs:complexType></xs:element></xs:schema>
+          </xs:documentation></xs:annotation><xs:simpleType><xs:restriction base="xs:string"><xs:maxLength value="100"/></xs:restriction></xs:simpleType></xs:element></xs:sequence></xs:complexType><xs:element name="organisaatio" type="virta:OrganisaatioKoodiTyyppi"/><xs:complexType name="HakuEhdot"><xs:choice><xs:element name="henkilotunnus" type="virta:HenkilotunnusTyyppi"/><xs:element name="kansallinenOppijanumero" type="xs:string"/></xs:choice></xs:complexType><xs:complexType name="HakuEhdotOrganisaatioVapaa"><xs:complexContent><xs:extension base="virtaluku:HakuEhdot"><xs:sequence><xs:element minOccurs="0" ref="virtaluku:organisaatio"/></xs:sequence></xs:extension></xs:complexContent></xs:complexType><xs:group name="PerusRequest"><xs:sequence><xs:element name="Kutsuja" type="virtaluku:Kutsuja"/><xs:element name="Hakuehdot" type="virtaluku:HakuEhdotOrganisaatioVapaa"/></xs:sequence></xs:group><xs:element name="OpiskelijanKaikkiTiedot"><xs:complexType><xs:group ref="virtaluku:PerusRequest"/></xs:complexType></xs:element><xs:element name="OpiskelijanKaikkiTiedotResponse"><xs:complexType><xs:sequence><xs:element ref="virta:Virta"/></xs:sequence></xs:complexType></xs:element><xs:element name="Opintosuoritukset"><xs:complexType><xs:group ref="virtaluku:PerusRequest"/></xs:complexType></xs:element><xs:element name="OpintosuorituksetResponse"><xs:complexType><xs:sequence><xs:element ref="virta:Opintosuoritukset"/></xs:sequence></xs:complexType></xs:element><xs:element name="Tutkinnot"><xs:complexType><xs:group ref="virtaluku:PerusRequest"/></xs:complexType></xs:element><xs:element name="TutkinnotResponse"><xs:complexType><xs:sequence><xs:element ref="virta:Opintosuoritukset"/></xs:sequence></xs:complexType></xs:element><xs:element name="LukukausiIlmoittautumiset"><xs:complexType><xs:group ref="virtaluku:PerusRequest"/></xs:complexType></xs:element><xs:element name="LukukausiIlmoittautumisetResponse"><xs:complexType><xs:sequence><xs:element ref="virta:LukukausiIlmoittautumiset"/></xs:sequence></xs:complexType></xs:element><xs:element name="Opiskeluoikeudet"><xs:complexType><xs:group ref="virtaluku:PerusRequest"/></xs:complexType></xs:element><xs:element name="OpiskeluoikeudetResponse"><xs:complexType><xs:sequence><xs:element ref="virta:Opiskeluoikeudet"/></xs:sequence></xs:complexType></xs:element><xs:element name="OpiskelijanTiedot"><xs:complexType><xs:sequence><xs:element name="Kutsuja" type="virtaluku:Kutsuja"/><xs:element name="Hakuehdot"><xs:complexType><xs:complexContent><xs:extension base="virtaluku:HakuEhdot"><xs:sequence><xs:element ref="virtaluku:organisaatio"/></xs:sequence></xs:extension></xs:complexContent></xs:complexType></xs:element></xs:sequence></xs:complexType></xs:element><xs:element name="OpiskelijanTiedotResponse"><xs:complexType><xs:sequence><xs:element ref="virta:Opiskelijat"/></xs:sequence></xs:complexType></xs:element><xs:import id="xrd" namespace="http://x-road.eu/xsd/xroad.xsd" schemaLocation="http://x-road.eu/xsd/xroad.xsd"/></xs:schema>
     <xs:schema xmlns:virta="urn:mace:funet.fi:virta/2015/09/01" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="urn:mace:funet.fi:virta/2015/09/01"><xs:element name="Virta"><xs:annotation><xs:documentation xml:lang="fi">
 			Kaikki korkeakoulun opiskelijat opiskeluoikeuksineen, ilmoittautumisineen ja opintosuorituksineen.
 		</xs:documentation><xs:documentation xml:lang="en">
@@ -664,7 +664,7 @@
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="TutkinnotRequest">
-    <wsdl:part element="tns:TutkinnotRequest" name="TutkinnotRequest">
+    <wsdl:part element="tns:Tutkinnot" name="TutkinnotRequest">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="OpiskeluoikeudetResponse">
@@ -672,15 +672,15 @@
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="OpiskeluoikeudetRequest">
-    <wsdl:part element="tns:OpiskeluoikeudetRequest" name="OpiskeluoikeudetRequest">
+    <wsdl:part element="tns:Opiskeluoikeudet" name="OpiskeluoikeudetRequest">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="OpintosuorituksetRequest">
-    <wsdl:part element="tns:OpintosuorituksetRequest" name="OpintosuorituksetRequest">
+    <wsdl:part element="tns:Opintosuoritukset" name="OpintosuorituksetRequest">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="OpiskelijanKaikkiTiedotRequest">
-    <wsdl:part element="tns:OpiskelijanKaikkiTiedotRequest" name="OpiskelijanKaikkiTiedotRequest">
+    <wsdl:part element="tns:OpiskelijanKaikkiTiedot" name="OpiskelijanKaikkiTiedotRequest">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="LukukausiIlmoittautumisetResponse">
@@ -692,11 +692,11 @@
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="OpiskelijanTiedotRequest">
-    <wsdl:part element="tns:OpiskelijanTiedotRequest" name="OpiskelijanTiedotRequest">
+    <wsdl:part element="tns:OpiskelijanTiedot" name="OpiskelijanTiedotRequest">
     </wsdl:part>
   </wsdl:message>
   <wsdl:message name="LukukausiIlmoittautumisetRequest">
-    <wsdl:part element="tns:LukukausiIlmoittautumisetRequest" name="LukukausiIlmoittautumisetRequest">
+    <wsdl:part element="tns:LukukausiIlmoittautumiset" name="LukukausiIlmoittautumisetRequest">
     </wsdl:part>
   </wsdl:message>
   <wsdl:portType name="OpiskelijanTiedot">

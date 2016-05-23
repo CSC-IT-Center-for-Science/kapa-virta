@@ -3,7 +3,7 @@ package com.gofore.kapaVirtaAS;
 /**
  * Created by joni on 10.5.2016.
  */
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.*;
@@ -19,28 +19,26 @@ import java.io.File;
 public class WSDLManipulator {
 
     private static final Logger log = LoggerFactory.getLogger(WSDLManipulator.class);
-    private static final String serviceName = "http://test.x-road.virta.csc.fi/producer";
-    private static final String xroadSchema = "xrd";
-    private static final String[] xroadReqHeaders = {"client", "service", "userId", "id", "issue", "protocolVersion"};
-    private static final String soapServiceURL = "http://localhost:8080/ws";
-    private static final String xroadImportId = "xrd";
-    private static final String xroadImportUrl = "http://x-road.eu/xsd/xroad.xsd";
+    private ASConfiguration conf;
 
+    public WSDLManipulator(ASConfiguration conf){
+        this.conf = conf;
+    }
 
-    public static Element replaceAttribute(Element el, String attributeName, String newValue) {
+    public Element replaceAttribute(Element el, String attributeName, String newValue) {
         el.removeAttribute(attributeName);
         el.setAttribute(attributeName, newValue);
         return el;
     }
     
-    public static Element soapHeader(Element el, String message, String part, String use) {
+    public Element soapHeader(Element el, String message, String part, String use) {
         el.setAttribute("message", message);
         el.setAttribute("part", part);
         el.setAttribute("use", use);
         return el;
     }
 
-    public static void generateVirtaKapaWSDL() throws Exception{
+    public void generateVirtaKapaWSDL() throws Exception{
         // Fetch current WSDL-file
         File inputFile = new File("target/wsdl/opiskelijatiedot.wsdl");
         DocumentBuilderFactory dbFactory
@@ -55,11 +53,11 @@ public class WSDLManipulator {
         // Root element <wsdl:definitions> attribute manipulations
         Element root = doc.getDocumentElement();
 
-        root.setAttribute("xmlns:"+xroadSchema, "http://x-road.eu/xsd/xroad.xsd");
-        root.setAttribute("xmlns:id", "http://x-road.eu/xsd/identifiers");
+        root.setAttribute("xmlns:"+conf.getXroadSchemaPrefixForWSDL(), conf.getXroadSchema());
+        root.setAttribute("xmlns:"+conf.getXroadIdSchemaPrefixForWSDL(), conf.getXroadIdSchema());
 
-        root = replaceAttribute(root, "xmlns:tns", serviceName);
-        root = replaceAttribute(root, "targetNamespace", serviceName);
+        root = replaceAttribute(root, "xmlns:tns", conf.getAdapterServiceSchema());
+        root = replaceAttribute(root, "targetNamespace", conf.getAdapterServiceSchema());
 
         // Schema elements <xs:schema> attribute manipulations
         NodeList schemas = root.getElementsByTagName("xs:schema");
@@ -69,14 +67,14 @@ public class WSDLManipulator {
             if(schema != null){
                 NamedNodeMap schemaAttributes = schema.getAttributes();
                 if(schemaAttributes != null && schemaAttributes.getNamedItem("xmlns:virtaluku") != null) {
-                    schemaAttributes.getNamedItem("xmlns:virtaluku").setTextContent(serviceName);
+                    schemaAttributes.getNamedItem("xmlns:virtaluku").setTextContent(conf.getAdapterServiceSchema());
                     if (schemaAttributes != null && schemaAttributes.getNamedItem("targetNamespace") != null) {
-                        schemaAttributes.getNamedItem("targetNamespace").setTextContent(serviceName);
+                        schemaAttributes.getNamedItem("targetNamespace").setTextContent(conf.getAdapterServiceSchema());
                     }
                     Element el = (Element) schema.appendChild(doc.createElement("xs:import"));
-                    el.setAttribute("id", xroadImportId);
-                    el.setAttribute("namespace", xroadImportUrl);
-                    el.setAttribute("schemaLocation", xroadImportUrl);
+                    el.setAttribute("id", conf.getXroadSchemaPrefixForWSDL());
+                    el.setAttribute("namespace", conf.getXroadSchema());
+                    el.setAttribute("schemaLocation", conf.getXroadSchema());
 
                     // Remove Request part from xs:element -elements
                     NodeList elementsInSchema = schema.getChildNodes();
@@ -91,15 +89,14 @@ public class WSDLManipulator {
             }
         }
 
-        // Append xroad requestheaders
-
+        // Append xroad request headers
         Element xroadReqHeadersElement = doc.createElement("wsdl:message");
         xroadReqHeadersElement.setAttribute("name","requestheader");
 
-        for(String xroadReqHeader : xroadReqHeaders){
+        for(String xroadHeader : conf.getXroadHeaders()){
             Element reqHeader = doc.createElement("wsdl:part");
-            reqHeader.setAttribute("name",xroadReqHeader);
-            reqHeader.setAttribute("element", xroadSchema+":"+xroadReqHeader);
+            reqHeader.setAttribute("name",xroadHeader);
+            reqHeader.setAttribute("element", conf.getXroadSchemaPrefixForWSDL()+":"+xroadHeader);
             xroadReqHeadersElement.appendChild(reqHeader);
         }
 
@@ -113,20 +110,17 @@ public class WSDLManipulator {
                 NodeList binding = childrenList.item(i).getChildNodes();
                 for (int j = 0; j < binding.getLength(); ++j) {
                     if (binding.item(j).getNodeName().contains("wsdl:operation")) {
-                        Element el1 = (Element) binding.item(j).appendChild(doc.createElement("id:version"));
-                        el1.setTextContent("v1");
+                        Element el1 = (Element) binding.item(j).appendChild(doc.createElement(conf.getXroadIdSchemaPrefixForWSDL()+":version"));
+                        el1.setTextContent(conf.getVirtaVersionForXRoad());
 
                         for (Node child = binding.item(j).getFirstChild(); child != null; child = child.getNextSibling()) {
 
                             // Append xroad wsdl:binding operation headers
                             if (child.getNodeName().contains("wsdl:input") || child.getNodeName().contains("wsdl:output")) {
                                 Element el = (Element) child;
-                                el.appendChild(soapHeader(doc.createElement("soap:header"), "tns:requestheader", "client", "literal"));
-                                el.appendChild(soapHeader(doc.createElement("soap:header"), "tns:requestheader", "service", "literal"));
-                                el.appendChild(soapHeader(doc.createElement("soap:header"), "tns:requestheader", "userId", "literal"));
-                                el.appendChild(soapHeader(doc.createElement("soap:header"), "tns:requestheader", "id", "literal"));
-                                el.appendChild(soapHeader(doc.createElement("soap:header"), "tns:requestheader", "issue", "literal"));
-                                el.appendChild(soapHeader(doc.createElement("soap:header"), "tns:requestheader", "protocolVersion", "literal"));
+                                for(String xroadHeader : conf.getXroadHeaders()) {
+                                    el.appendChild(soapHeader(doc.createElement("soap:header"), "tns:requestheader", xroadHeader, "literal"));
+                                }
                             }
 
                             if (child.getNodeName().contains("wsdl:input")) {
@@ -166,7 +160,7 @@ public class WSDLManipulator {
                         for (Node child = service.item(j).getFirstChild(); child != null; child = child.getNextSibling()) {
                             if (child.getNodeName().contains("soap:address")){
                                 Element el = (Element) child;
-                                replaceAttribute(el, "location", soapServiceURL);
+                                replaceAttribute(el, "location", conf.getAdapterServiceSOAPURL());
                             }
                         }
                     }

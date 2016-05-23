@@ -20,10 +20,7 @@ import java.io.StringWriter;
  */
 public class SOAPMessageTransformer {
     private static final Logger log = LoggerFactory.getLogger(VirtaClient.class);
-    private final String ASserviceURI = "http://test.x-road.virta.csc.fi/producer";
-    private final String virtaServiceURI = "http://tietovaranto.csc.fi/luku";
-    private final String xroadSchemaURI = "http://x-road.eu/xsd/xroad.xsd";
-    private final String xroadIdSchemaURI = "http://x-road.eu/xsd/identifiers";
+    private ASConfiguration conf;
     private String xroadSchemaPrefix;
     private String xroadIdSchemaPrefix;
     private String virtaServicePrefix = "xmlns:virtaluku";
@@ -35,7 +32,8 @@ public class SOAPMessageTransformer {
         VirtaToXRoad;
     }
 
-    public SOAPMessageTransformer() {
+    public SOAPMessageTransformer(ASConfiguration conf) {
+        this.conf = conf;
     }
 
     public String transform(String message, MessageDirection direction) throws Exception {
@@ -51,23 +49,23 @@ public class SOAPMessageTransformer {
             for (int i = 0; i < rootAttributes.getLength(); ++i) {
                 if (rootAttributes.item(i) != null &&
                         rootAttributes.item(i).getNodeName() != null &&
-                        xroadSchemaURI.equals(rootAttributes.item(i).getNodeValue())) {
+                        conf.getXroadSchema().equals(rootAttributes.item(i).getNodeValue())) {
                     xroadSchemaPrefix = rootAttributes.item(i).getNodeName();
                 }
                 if (rootAttributes.item(i) != null &&
                         rootAttributes.item(i).getNodeName() != null &&
-                        xroadIdSchemaURI.equals(rootAttributes.item(i).getNodeValue())) {
+                        conf.getXroadIdSchema().equals(rootAttributes.item(i).getNodeValue())) {
                     xroadIdSchemaPrefix = rootAttributes.item(i).getNodeName();
                 }
             }
         }
         // Add XRoad schemas with saved prefix to response message
         if (direction == MessageDirection.VirtaToXRoad) {
-            if(xroadSchemaURI != null && xroadSchemaPrefix != null) {
-                root.setAttribute(xroadSchemaPrefix, xroadSchemaURI);
+            if(xroadSchemaPrefix != null) {
+                root.setAttribute(xroadSchemaPrefix, conf.getXroadSchema());
             }
-            if(xroadIdSchemaURI != null && xroadIdSchemaPrefix != null) {
-                root.setAttribute(xroadIdSchemaPrefix, xroadIdSchemaURI);
+            if(xroadIdSchemaPrefix != null) {
+                root.setAttribute(xroadIdSchemaPrefix, conf.getXroadIdSchema());
             }
         }
 
@@ -77,12 +75,12 @@ public class SOAPMessageTransformer {
             Node attribute = attributes.item(i);
 
             if (direction == MessageDirection.XRoadToVirta &&
-                    attribute.getNodeValue().contains(ASserviceURI)) {
-                attribute.setNodeValue(virtaServiceURI);
+                    attribute.getNodeValue().contains(conf.getAdapterServiceSchema())) {
+                attribute.setNodeValue(conf.getVirtaServiceSchema());
             }
             if (direction == MessageDirection.VirtaToXRoad &&
-                    attribute.getNodeValue().contains(ASserviceURI)) {
-
+                    attribute.getNodeValue().contains(conf.getVirtaServiceSchema())) {
+                attribute.setNodeValue(conf.getAdapterServiceSchema());
             }
         }
 
@@ -122,27 +120,16 @@ public class SOAPMessageTransformer {
 
                             //Add postfix after SOAP-operation name
                             //eg. Opintosuoritukset -> OpintosuorituksetRequest
-                            doc.renameNode(soapOperationElement, virtaServiceURI, soapOperationElement.getTagName() + "Request");
-
-                            String namespace = "pro";
-                            soapOperationElement.removeAttributeNS(namespace, ASserviceURI);
-                            soapOperationElement.setAttribute(namespace, virtaServiceURI);
+                            doc.renameNode(soapOperationElement, conf.getVirtaServiceSchema(), soapOperationElement.getTagName() + "Request");
                         }
 
                         if (direction == MessageDirection.VirtaToXRoad) {
                             //Response part namespace change
                             soapOperationElement.removeAttribute(virtaServicePrefix);
-                            soapOperationElement.setAttribute(virtaServicePrefix,ASserviceURI);
+                            soapOperationElement.setAttribute(virtaServicePrefix, conf.getAdapterServiceSchema());
                         }
                     }
                 }
-
-                //Add request body in SOAP-body (optional in XRoad)
-                /*  need to change schema
-                if (direction == MessageDirection.VirtaToXRoad) {
-                    Node request = child.appendChild(doc.importNode(xroadRequestBody, true));
-                    //doc.renameNode(request, virtaServiceURI, soapOperationElement.getTagName());
-                }*/
             }
         }
 
@@ -159,7 +146,7 @@ public class SOAPMessageTransformer {
 
     private String stripXmlDefinition(String message) {
         //Remove xml definition element, if any
-        //eg. <?xml version="1.1" encoding="UTF-8" standalone="no"?>
+        //eg. <?xml version="1.0" encoding="UTF-8" standalone="no"?>
         String sub = StringUtils.substringAfter(message, "?>");
         if(sub != null && sub != ""){
             return sub;
