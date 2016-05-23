@@ -9,7 +9,11 @@
             <id:subsystemCode>ConsumerService</id:subsystemCode>
         </xro:client>
         <xro:service>
+            <id:xRoadInstance>FI</id:xRoadInstance>
+            <id:memberClass>COV</id:memberClass>
+            <id:memberCode>1234</id:memberCode>
             <id:serviceCode>opintosuoritukset</id:serviceCode>
+            <id:serviceVersion>v1</id:serviceVersion>
         </xro:service>
         <xro:userId>abcd</xro:userId>
         <xro:id>efgh</xro:id>

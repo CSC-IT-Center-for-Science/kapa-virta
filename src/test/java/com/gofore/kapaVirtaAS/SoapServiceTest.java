@@ -72,6 +72,17 @@ public class SoapServiceTest {
                 .andExpect(content().contentType("text/xml"));
     }
 
+    @Test
+    public void testResponseClientServiceInformation() throws  Exception {
+        mockMvc.perform(post("/ws/").content(testReq1))
+                .andExpect(status().isOk())
+                .andExpect(xpath("//*[local-name()='service']/*[local-name()='xRoadInstance']/text()").string("FI"))
+                .andExpect(xpath("//*[local-name()='service']/*[local-name()='memberClass']/text()").string("COV"))
+                .andExpect(xpath("//*[local-name()='service']/*[local-name()='memberCode']/text()").string("1234"))
+                .andExpect(xpath("//*[local-name()='service']/*[local-name()='serviceCode']/text()").string("opintosuoritukset"))
+                .andExpect(xpath("//*[local-name()='service']/*[local-name()='serviceVersion']/text()").string("v1"));
+    }
+
     private String readFile(String filename) throws Exception {
         String content = null;
         File file = new File(filename); //for ex foo.txt
