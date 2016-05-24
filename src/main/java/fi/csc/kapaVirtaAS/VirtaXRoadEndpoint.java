@@ -13,11 +13,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.InputStreamReader;
 
 /**
  * Created by joni on 9.5.2016.
  */
+
 @RestController
 public class VirtaXRoadEndpoint {
     private static final Logger log = LoggerFactory.getLogger(VirtaXRoadEndpoint.class);
@@ -28,6 +31,7 @@ public class VirtaXRoadEndpoint {
     public String healthCheck(){
         return "KapaVirta adapter service running.";
     }
+
 
     @RequestMapping(value="/ws", method= RequestMethod.POST)
     public ResponseEntity<String> getVirtaResponse(@RequestBody String XRoadRequestMessage) throws Exception{
@@ -94,5 +98,24 @@ public class VirtaXRoadEndpoint {
     private static boolean validateXRoadResponse(String XRoadResponse){
 
         return true;
+    }
+
+    private String readFile(String filename) throws Exception {
+        String content = null;
+        File file = new File(filename);
+        FileReader reader = null;
+        try {
+            reader = new FileReader(file);
+            char[] chars = new char[(int) file.length()];
+            reader.read(chars);
+            content = new String(chars);
+            reader.close();
+        }
+        finally {
+            if(reader != null){
+                reader.close();
+            }
+        }
+        return content;
     }
 }

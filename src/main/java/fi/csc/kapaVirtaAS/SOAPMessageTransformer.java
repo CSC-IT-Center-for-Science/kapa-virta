@@ -112,21 +112,29 @@ public class SOAPMessageTransformer {
             if (child != null && child.getNodeName().toLowerCase().contains("body")) {
                 for (Node bodyNode = child.getFirstChild(); bodyNode != null; bodyNode = bodyNode.getNextSibling()) {
                     //Change request appendix to operation input name
-                    if (bodyNode.getNodeType() == Node.ELEMENT_NODE && !bodyNode.getNodeName().toLowerCase().contains("fault")) {
+                    if (bodyNode.getNodeType() == Node.ELEMENT_NODE) {
                         Element soapOperationElement = (Element) bodyNode;
-                        if (direction == MessageDirection.XRoadToVirta) {
-                            //Save XRoadRequestBody for response message
-                            xroadRequestBody = soapOperationElement.cloneNode(true);
 
-                            //Add postfix after SOAP-operation name
-                            //eg. Opintosuoritukset -> OpintosuorituksetRequest
-                            doc.renameNode(soapOperationElement, conf.getVirtaServiceSchema(), soapOperationElement.getTagName() + "Request");
+                        //Virta gives malformed soap fault message. Need to pares it correct.
+                        if(bodyNode.getNodeName().toLowerCase().contains("fault")){
+                            ((Element)soapOperationElement.getElementsByTagName("faultstring").item(0)).removeAttribute("xml:lang");
                         }
+                        else {
 
-                        if (direction == MessageDirection.VirtaToXRoad) {
-                            //Response part namespace change
-                            soapOperationElement.removeAttribute(virtaServicePrefix);
-                            soapOperationElement.setAttribute(virtaServicePrefix, conf.getAdapterServiceSchema());
+                            if (direction == MessageDirection.XRoadToVirta) {
+                                //Save XRoadRequestBody for response message
+                                xroadRequestBody = soapOperationElement.cloneNode(true);
+
+                                //Add postfix after SOAP-operation name
+                                //eg. Opintosuoritukset -> OpintosuorituksetRequest
+                                doc.renameNode(soapOperationElement, conf.getVirtaServiceSchema(), soapOperationElement.getTagName() + "Request");
+                            }
+
+                            if (direction == MessageDirection.VirtaToXRoad) {
+                                //Response part namespace change
+                                soapOperationElement.removeAttribute(virtaServicePrefix);
+                                soapOperationElement.setAttribute(virtaServicePrefix, conf.getAdapterServiceSchema());
+                            }
                         }
                     }
                 }

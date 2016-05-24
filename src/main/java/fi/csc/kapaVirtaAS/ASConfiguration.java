@@ -2,7 +2,6 @@ package fi.csc.kapaVirtaAS;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.oxm.ValidationFailureException;
 import org.w3c.dom.Element;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -25,6 +24,7 @@ public class ASConfiguration {
     private final String xroadIdSchemaPrefixForWSDL;
     private final String adapterServiceSchema;
     private final String adapterServiceSOAPURL;
+    private final String adapterServiceWSDLPath;
     private final String virtaWSDLURL;
     private final String virtaVersionForXRoad;
     private final String virtaServiceSchema;
@@ -33,7 +33,7 @@ public class ASConfiguration {
         File inputFile = new File("../" + confFileName);
         if (inputFile.canRead() == false) {
             //For developing environment
-            inputFile = new File("target/" + confFileName);
+            inputFile = new File("static/" + confFileName);
         }
         else{
             log.info("Config file found from path: ../");
@@ -41,16 +41,18 @@ public class ASConfiguration {
         if (inputFile.canRead() == false) {
             //For tomcat environment
             inputFile = new File("webapps/" + confFileName);
+
+            if(inputFile.canRead() == true){
+                log.info("Config file found from path: webapps/");
+            }
+            else{
+                throw new Exception("Could not find config file.");
+            }
         }
         else{
             log.info("Config file found from path: target/");
         }
-        if(inputFile.canRead() == true){
-            log.info("Config file found from path: webapps/");
-        }
-        else{
-            throw new Exception("Could not find config file.");
-        }
+
 
         DocumentBuilderFactory dbFactory
                 = DocumentBuilderFactory.newInstance();
@@ -68,6 +70,7 @@ public class ASConfiguration {
         this.xroadIdSchemaPrefixForWSDL = root.getElementsByTagName("xroadIdSchemaPrefixForWSDL").item(0).getFirstChild().getNodeValue();
         this.adapterServiceSchema = root.getElementsByTagName("adapterServiceSchema").item(0).getFirstChild().getNodeValue();
         this.adapterServiceSOAPURL = root.getElementsByTagName("adapterServiceSOAPURL").item(0).getFirstChild().getNodeValue();
+        this.adapterServiceWSDLPath = root.getElementsByTagName("adapterServiceWSDLPath").item(0).getFirstChild().getNodeValue();
         this.virtaWSDLURL = root.getElementsByTagName("virtaWSDLURL").item(0).getFirstChild().getNodeValue();
         this.virtaVersionForXRoad = root.getElementsByTagName("virtaVersionForXRoad").item(0).getFirstChild().getNodeValue();
         this.virtaServiceSchema = root.getElementsByTagName("virtaServiceSchema").item(0).getFirstChild().getNodeValue();
@@ -93,6 +96,10 @@ public class ASConfiguration {
 
     public String getAdapterServiceSOAPURL() {
         return adapterServiceSOAPURL;
+    }
+
+    public String getAdapterServiceWSDLPath() {
+        return adapterServiceWSDLPath;
     }
 
     public String getVirtaWSDLURL() {

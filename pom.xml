@@ -101,7 +101,7 @@
                             <outputDirectory>${project.build.directory}</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>src/main/external-resources</directory>
+                                    <directory>static</directory>
                                 </resource>
                             </resources>
                         </configuration>

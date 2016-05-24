@@ -16,6 +16,7 @@
     <adapterService>
         <adapterServiceSchema>http://test.x-road.virta.csc.fi/luku</adapterServiceSchema>
         <adapterServiceSOAPURL>http://localhost:8080/ws</adapterServiceSOAPURL>
+        <adapterServiceWSDLPath>.</adapterServiceWSDLPath>
     </adapterService>
     <virta>
         <virtaWSDLURL>http://virtawstesti.csc.fi/luku106/opiskelijatiedot.wsdl</virtaWSDLURL>

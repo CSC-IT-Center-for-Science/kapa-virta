@@ -172,7 +172,7 @@ public class WSDLManipulator {
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         Transformer transformer = transformerFactory.newTransformer();
         DOMSource source = new DOMSource(doc);
-        StreamResult result = new StreamResult(new File("static/wsdl/generatedKapavirta.wsdl"));
+        StreamResult result = new StreamResult(new File(conf.getAdapterServiceWSDLPath()+"/kapavirta_as.wsdl"));
         transformer.transform(source, result);
     }
 }
