@@ -5,7 +5,7 @@
 
     <groupId>fi.csc</groupId>
     <artifactId>kapa-virta</artifactId>
-    <version>0.1.0</version>
+    <version>1.0.0</version>
 
     <packaging>jar</packaging>
 
@@ -72,7 +72,7 @@
                         <configuration>
                             <target>
                                 <mkdir dir="${project.build.directory}"/>
-                                <get src="http://virtawstesti.csc.fi/luku106/opiskelijatiedot.wsdl"
+                                <get src="http://dwidvirtaws.csc.fi/luku/opiskelijatiedot.wsdl"
                                      dest="./target"
                                      verbose="false"
                                      usetimestamp="true"/>
