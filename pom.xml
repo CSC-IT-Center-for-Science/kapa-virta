@@ -7,6 +7,7 @@
     <artifactId>kapa-virta</artifactId>
     <version>0.1.0</version>
 
+    <packaging>jar</packaging>
 
     <properties>
         <java.version>1.8</java.version>
@@ -72,7 +73,7 @@
                             <target>
                                 <mkdir dir="${project.build.directory}"/>
                                 <get src="http://virtawstesti.csc.fi/luku106/opiskelijatiedot.wsdl"
-                                     dest="./"
+                                     dest="./target"
                                      verbose="false"
                                      usetimestamp="true"/>
                             </target>
