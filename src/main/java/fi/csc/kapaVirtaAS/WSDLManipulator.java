@@ -40,7 +40,7 @@ public class WSDLManipulator {
 
     public void generateVirtaKapaWSDL() throws Exception{
         // Fetch current WSDL-file
-        File inputFile = new File("target/wsdl/opiskelijatiedot.wsdl");
+        File inputFile = new File("opiskelijatiedot.wsdl");
         DocumentBuilderFactory dbFactory
                 = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();

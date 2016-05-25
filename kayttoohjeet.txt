@@ -1,27 +1,43 @@
 Asennus ja käyttöohjeet - Kapa-Virta sovitinpalvelimelle:
 
 Yleistä:
--Toteutettu Java8:lla
+-Toteutettu Java8:lla käyttäen Springframeworkkia ja Springboottia
 -Buildin teko tapahtuu Mavenilla
--Sovelluspalvelin toimii SpringBootilla ilman erillistä sovelluspalvelinta (Springbootin sisäinen tomcat) 
- TAI .war tiedostona sovelluspalvelimessa, kuten Tomcatissa (Vähintään Tomcat 7.0, koska vaaditaan Servlet 3.0 tuki)
--Springboot käynnistys komennolla: mvn spring-boot:run
--.war paketin luonti target/ -kansioon komennolla: mvn package
--Molemmissa tapauksissa target/ -kansioon luodaan adapterServiceConf.xml tiedosto johon tulee asettaa oikeat konfiguraatiot
+-Kehitysympäristössä Springboot käynnistys komennolla: mvn spring-boot:run
+-.jar paketin luonti tuotantoa varten target/ -kansioon komennolla: mvn package
+-Target kansioon generoidaan myös adapterServiceConf.xml ja opiskelijatiedot.wsdl
+ja nämä tiedostot täytyy kopioida jar tiedoston lisäksi mukaan
 
+--------------------------------------------------
+Springboot
 
-Konfiguraatiotiedosto:
--.war tiedostoa ajettaessa adapterServiceConf.xml tiedoston tulee olla samassa kansiossa .war tiedoston kanssa
+-Jar-paketista käynnistäminen komennolla [valinnaiset vipuset hakasulkeissa]:
+java -jar kapavirta_as.jar [--server.port=9000][--configuration.path=/path/to/configfile]
+
+-Käynnistyksessä sovellus lukee opiskelijatiedot.wsdl tiedoston ja luo sen avulla uuden kapavirta_as.wsdl
+tiedoston joka toimii palvelun wsdl kuvauksena liityntäpalvelimelle ja siten xroadille.
+
+-Springbootin versiota voi päivittää uudemmaksi muuttamalla versionumeroa lähdekoodista löytyvään pom.xml tiedostoon
+ja tekemällä buildin uudelleen. pom.xml tiedoston alkuosassa on properties-lohko josta löytyy springboot.version
+Uusimman maveniin saatavan Springboot version voi tarkistaa esim. http://mvnrepository.com/artifact/org.springframework.boot/spring-boot
+
+--------------------------------------------------
+Konfiguraatiotiedosto adapterServiceConf.xml
+
+-Konfiguraatiotiedostoa etsitään automaattisesti samasta hakemistosta, jossa ajettava sovellus on
+-Konfiguraatiotiedoston hakemiston voi myös määrittää käynnistyksen aikana käyttämällä vipua --configuration.path=/path/to/configfile
+
 -Konfiguraatio on jaettu kolmeen lohkoon: xroad, adapterService ja virta:
 
 -->> xroad sisältää kansallisen palveluväylän konfiguraatiot ja niitä ei yleensä tarvitse muuttaa
 
 -->> adapterService sisältää tämän sovitinpalvelimen konfiguraatiot ja ne täytyy asettaa oikeaksi
 ->adapterServiceSchema: Haluttu url tämän sovitinpalvelimen skeemaksi. Skeemassa täytyy olla lopussa sama polku kuin virran skeemassa esim. /luku
-->adapterServiceSOAPURL: Tämän liityntäpalvelimen osoite, johon xroad liityntäpalvelin ojaa xroadilta tulevat SOAP viestit. Springboottia käytettäessä portti on 8080.
+->adapterServiceSOAPURL: Tämän liityntäpalvelimen osoite, johon xroad liityntäpalvelin ohjaa xroadilta tulevat SOAP viestit. Osoite lisätään wsdl kuvaukseen. Muista porttinumero, jos käytetään jotain muuta kuin 80.
+->adapterServiceWSDLPath: Polku johon sovitinpalvelin generoi oman wsdl kuvauksensa ja josta se sitä jakaa eteenpäin
 
 -->> virta sisältää virta tietovarannon tai sen testiympäristön konfiguraatiot
-->virtaWSDLURL: Osoite josta virra wsdl kuvaus on saatavilla
+->virtaWSDLURL: Osoite josta virran wsdl kuvaus on saatavilla.
 ->virtaServiceSchema: Virran käyttämä skeeman URL pyyntö- ja vastaustyypeille. (Esim. versiossa 1.06: http://tietovaranto.csc.fi/luku)
 ->virtaVersionIdForXRoad: XRoadin vaatima versionumero Virran palveluista, joka näkyy XRoadin käyttäjille.
 

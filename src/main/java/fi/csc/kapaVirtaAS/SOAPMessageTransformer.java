@@ -115,7 +115,7 @@ public class SOAPMessageTransformer {
                     if (bodyNode.getNodeType() == Node.ELEMENT_NODE) {
                         Element soapOperationElement = (Element) bodyNode;
 
-                        //Virta gives malformed soap fault message. Need to pares it correct.
+                        //Virta gives malformed soap fault message. Need to parse it correct.
                         if(bodyNode.getNodeName().toLowerCase().contains("fault")){
                             ((Element)soapOperationElement.getElementsByTagName("faultstring").item(0)).removeAttribute("xml:lang");
                         }

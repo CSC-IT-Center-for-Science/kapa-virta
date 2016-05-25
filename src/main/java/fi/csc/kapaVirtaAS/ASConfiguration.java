@@ -2,6 +2,7 @@ package fi.csc.kapaVirtaAS;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.w3c.dom.Element;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -29,41 +30,69 @@ public class ASConfiguration {
     private final String virtaVersionForXRoad;
     private final String virtaServiceSchema;
 
-    public ASConfiguration() throws Exception {
-        File inputFile = new File("../" + confFileName);
-        if (inputFile.canRead() == false) {
-            //For developing environment
-            inputFile = new File("static/" + confFileName);
+    //Can be used like
+    //java -jar kapavirta_as.jar --configuration.path=/path/to/config-file/
+    @Value("${configuration.path}")
+    private static String confFilePath;
+
+    private File locateInputFile() throws Exception{
+        File confFile = new File(confFilePath+confFileName);
+
+        if (confFile.canRead() == true){
+            log.info("Config file found from path: "+confFilePath);
+            return confFile;
         }
-        else{
+
+        confFile = new File("../" + confFileName);
+        if (confFile.canRead() == true){
             log.info("Config file found from path: ../");
-        }
-        if (inputFile.canRead() == false) {
-            //For tomcat environment
-            inputFile = new File("webapps/" + confFileName);
-
-            if(inputFile.canRead() == true){
-                log.info("Config file found from path: webapps/");
-            }
-            else{
-                throw new Exception("Could not find config file.");
-            }
-        }
-        else{
-            log.info("Config file found from path: target/");
+            return confFile;
         }
 
+        confFile = new File("./" + confFileName);
+        if (confFile.canRead() == true){
+            log.info("Config file found from path: ./");
+            return confFile;
+        }
 
-        DocumentBuilderFactory dbFactory
-                = DocumentBuilderFactory.newInstance();
-        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        Element root = dBuilder.parse(inputFile).getDocumentElement();
+        confFile = new File("./static/" + confFileName);
+        if (confFile.canRead() == true){
+            log.info("Config file found from path: ./static/");
+            return confFile;
+        }
+
+        confFile = new File("./webapps/" + confFileName);
+        if (confFile.canRead() == true) {
+            log.info("Config file found from path: ./webapps/");
+            return confFile;
+        }
+
+        throw new Exception("Could not find config file.");
+    }
+
+    public ASConfiguration() {
+        Element root = null;
+
+        try {
+            File inputFile = locateInputFile();
+
+            DocumentBuilderFactory dbFactory
+                    = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            root = dBuilder.parse(inputFile).getDocumentElement();
+
+
+        }
+        catch(Exception e){
+            log.error("Error with configuration file.");
+            log.error(e.toString());
+        }
+
 
         this.xroadHeaders = new ArrayList();
-        for(int i = 0; i < root.getElementsByTagName("header").getLength(); ++i){
+        for (int i = 0; i < root.getElementsByTagName("header").getLength(); ++i) {
             this.xroadHeaders.add(root.getElementsByTagName("header").item(i).getFirstChild().getNodeValue());
         }
-
         this.xroadSchema = root.getElementsByTagName("xroadSchema").item(0).getFirstChild().getNodeValue();
         this.xroadIdSchema = root.getElementsByTagName("xroadIdSchema").item(0).getFirstChild().getNodeValue();
         this.xroadSchemaPrefixForWSDL = root.getElementsByTagName("xroadSchemaPrefixForWSDL").item(0).getFirstChild().getNodeValue();
@@ -74,6 +103,7 @@ public class ASConfiguration {
         this.virtaWSDLURL = root.getElementsByTagName("virtaWSDLURL").item(0).getFirstChild().getNodeValue();
         this.virtaVersionForXRoad = root.getElementsByTagName("virtaVersionForXRoad").item(0).getFirstChild().getNodeValue();
         this.virtaServiceSchema = root.getElementsByTagName("virtaServiceSchema").item(0).getFirstChild().getNodeValue();
+
     }
 
     public List<String> getXroadHeaders() { return xroadHeaders; }

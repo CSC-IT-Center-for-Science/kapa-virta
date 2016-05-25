@@ -24,6 +24,7 @@ import java.io.InputStreamReader;
 @RestController
 public class VirtaXRoadEndpoint {
     private static final Logger log = LoggerFactory.getLogger(VirtaXRoadEndpoint.class);
+    private static final ASConfiguration conf = new ASConfiguration();
     private final String[] headersToCopy = {"Content-Type", "Connection", "SOAPAction"};
     private final String ERROR_MESSAGE = "XRoad-Virta adapterservice encountered internal server error";
 
@@ -35,7 +36,7 @@ public class VirtaXRoadEndpoint {
 
     @RequestMapping(value="/ws", method= RequestMethod.POST)
     public ResponseEntity<String> getVirtaResponse(@RequestBody String XRoadRequestMessage) throws Exception{
-        SOAPMessageTransformer messageTransformer = new SOAPMessageTransformer(new ASConfiguration());
+        SOAPMessageTransformer messageTransformer = new SOAPMessageTransformer(conf);
         VirtaClient virtaClient = new VirtaClient();
 
         HttpHeaders headers = new HttpHeaders();
@@ -85,19 +86,7 @@ public class VirtaXRoadEndpoint {
             return new ResponseEntity<>(ERROR_MESSAGE, headers, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        //Validate transformed SOAP-response
-        if(!validateXRoadResponse(XRoadResponseMessage)){
-            log.error("Validate failed");
-            return new ResponseEntity<>(ERROR_MESSAGE, headers, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-
         return new ResponseEntity<>(XRoadResponseMessage, headers, HttpStatus.OK);
-    }
-
-    private static boolean validateXRoadResponse(String XRoadResponse){
-
-        return true;
     }
 
     private String readFile(String filename) throws Exception {

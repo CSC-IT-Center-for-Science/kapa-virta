@@ -7,11 +7,9 @@
     <artifactId>kapa-virta</artifactId>
     <version>0.1.0</version>
 
-    <packaging>war</packaging>
 
     <properties>
         <java.version>1.8</java.version>
-        <cxf.version>3.1.6</cxf.version>
         <springboot.version>1.3.5.RELEASE</springboot.version>
         <start-class>fi.csc.kapaVirtaAS.Application</start-class>
     </properties>
@@ -26,11 +24,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <version>${springboot.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
             <version>${springboot.version}</version>
         </dependency>
         <dependency>
@@ -77,9 +70,9 @@
                         </goals>
                         <configuration>
                             <target>
-                                <mkdir dir="${project.build.directory}/wsdl"/>
+                                <mkdir dir="${project.build.directory}"/>
                                 <get src="http://virtawstesti.csc.fi/luku106/opiskelijatiedot.wsdl"
-                                     dest="${project.build.directory}/wsdl"
+                                     dest="./"
                                      verbose="false"
                                      usetimestamp="true"/>
                             </target>
@@ -110,17 +103,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>tomcat</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-tomcat</artifactId>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 </project>

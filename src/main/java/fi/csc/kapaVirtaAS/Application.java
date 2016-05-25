@@ -23,8 +23,9 @@ public class Application extends SpringBootServletInitializer {
     }
 
     public static void main(String[] args) throws Exception {
-        WSDLManipulator wsdlManipulator = new WSDLManipulator(new ASConfiguration());
-        log. info("Adapter service configuration loaded.");
+        ASConfiguration conf = new ASConfiguration();
+        WSDLManipulator wsdlManipulator = new WSDLManipulator(conf);
+        log.info("Adapter service configuration loaded.");
         wsdlManipulator.generateVirtaKapaWSDL();
         log.info("Adapter service WSDL generated.");
         SpringApplication.run(Application.class, args);
