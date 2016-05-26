@@ -1,0 +1,16 @@
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xro="http://x-road.eu/xsd/xroad.xsd">
+    <SOAP-ENV:Header>
+
+    </SOAP-ENV:Header>
+    <SOAP-ENV:Body>
+        <SOAP-ENV:Fault>
+            <faultcode>SOAP-ENV:Client</faultcode>
+            <faultstring>
+
+            </faultstring>
+            <detail>
+
+            </detail>
+        </SOAP-ENV:Fault>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

@@ -31,6 +31,7 @@ import java.io.IOException;
 
 public class VirtaClient {
 
+    private static final ASConfiguration conf = new ASConfiguration();
     private static final Logger log = LoggerFactory.getLogger(VirtaClient.class);
 
     public VirtaClient() {
@@ -41,7 +42,7 @@ public class VirtaClient {
             HttpClient client = HttpClientBuilder.create().build();
 
             //HTTP post
-            HttpPost post = new HttpPost("http://virtawstesti.csc.fi:80/luku106/OpiskelijanTiedot");
+            HttpPost post = new HttpPost(conf.getVirtaSOAPURL());
             post.setHeader("Content-type","text/xml");
             //SOAP message to HTTP body
             HttpEntity entity = new ByteArrayEntity(virtaRequestMessage.getBytes());

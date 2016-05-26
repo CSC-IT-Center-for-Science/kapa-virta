@@ -36,27 +36,29 @@ public class VirtaXRoadEndpoint {
 
     @RequestMapping(value="/ws", method= RequestMethod.POST)
     public ResponseEntity<String> getVirtaResponse(@RequestBody String XRoadRequestMessage) throws Exception{
-        SOAPMessageTransformer messageTransformer = new SOAPMessageTransformer(conf);
+        MessageTransformer messageTransformer = new MessageTransformer(conf);
         VirtaClient virtaClient = new VirtaClient();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.TEXT_XML);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.TEXT_XML);
 
         //Transform SOAP-request to Virta
         String virtaRequestMessage;
         try {
             virtaRequestMessage = messageTransformer.transform(XRoadRequestMessage,
-                    SOAPMessageTransformer.MessageDirection.XRoadToVirta);
-        }
-        catch (Exception e){
+                    MessageTransformer.MessageDirection.XRoadToVirta);
+        } catch (Exception e){
             log.error(e.toString());
-            return new ResponseEntity<>(ERROR_MESSAGE, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(FaultMessageService.generateSOAPFault(ERROR_MESSAGE,
+                            FaultMessageService.getReqValidFail(),
+                            messageTransformer.getXroadHeaderElement()),
+                    httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         //Send transformed SOAP-request to Virta
         HttpResponse virtaResponse = virtaClient.getVirtaWS(virtaRequestMessage);
         if(virtaResponse == null){
-            new ResponseEntity<>(ERROR_MESSAGE, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+            new ResponseEntity<>(ERROR_MESSAGE, httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         //Exctract response message
@@ -71,22 +73,28 @@ public class VirtaXRoadEndpoint {
                 result.append(line);
             }
             virtaResponseMessage = result.toString();
-        } catch(Exception e){
-            log.error(e.getMessage());
-            return new ResponseEntity<>(ERROR_MESSAGE, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e){
+            log.error(e.toString());
+            return new ResponseEntity<>(FaultMessageService.generateSOAPFault(ERROR_MESSAGE,
+                    FaultMessageService.getResValidFail(),
+                    messageTransformer.getXroadHeaderElement()),
+                    httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         //Transform SOAP-response to XRoad
         String XRoadResponseMessage;
         try {
             XRoadResponseMessage = messageTransformer.transform(virtaResponseMessage,
-                    SOAPMessageTransformer.MessageDirection.VirtaToXRoad);
-        }catch (Exception e){
+                    MessageTransformer.MessageDirection.VirtaToXRoad);
+        } catch (Exception e){
             log.error(e.toString());
-            return new ResponseEntity<>(ERROR_MESSAGE, headers, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(FaultMessageService.generateSOAPFault(ERROR_MESSAGE,
+                    FaultMessageService.getResValidFail(),
+                    messageTransformer.getXroadHeaderElement()),
+                    httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return new ResponseEntity<>(XRoadResponseMessage, headers, HttpStatus.OK);
+        return new ResponseEntity<>(XRoadResponseMessage, httpHeaders, HttpStatus.OK);
     }
 
     private String readFile(String filename) throws Exception {

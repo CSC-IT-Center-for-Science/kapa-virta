@@ -19,7 +19,7 @@
         <adapterServiceWSDLPath>./</adapterServiceWSDLPath>
     </adapterService>
     <virta>
-        <virtaWSDLURL>http://virtawstesti.csc.fi/luku106/opiskelijatiedot.wsdl</virtaWSDLURL>
+        <virtaSOAPURL>http://virtawstesti.csc.fi:80/luku106/OpiskelijanTiedot</virtaSOAPURL>
         <virtaServiceSchema>http://tietovaranto.csc.fi/luku</virtaServiceSchema>
         <virtaVersionForXRoad>v1</virtaVersionForXRoad>
     </virta>

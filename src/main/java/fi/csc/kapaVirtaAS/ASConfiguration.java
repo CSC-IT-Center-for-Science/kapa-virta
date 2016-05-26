@@ -26,7 +26,7 @@ public class ASConfiguration {
     private final String adapterServiceSchema;
     private final String adapterServiceSOAPURL;
     private final String adapterServiceWSDLPath;
-    private final String virtaWSDLURL;
+    private final String virtaSOAPURL;
     private final String virtaVersionForXRoad;
     private final String virtaServiceSchema;
 
@@ -100,7 +100,7 @@ public class ASConfiguration {
         this.adapterServiceSchema = root.getElementsByTagName("adapterServiceSchema").item(0).getFirstChild().getNodeValue();
         this.adapterServiceSOAPURL = root.getElementsByTagName("adapterServiceSOAPURL").item(0).getFirstChild().getNodeValue();
         this.adapterServiceWSDLPath = root.getElementsByTagName("adapterServiceWSDLPath").item(0).getFirstChild().getNodeValue();
-        this.virtaWSDLURL = root.getElementsByTagName("virtaWSDLURL").item(0).getFirstChild().getNodeValue();
+        this.virtaSOAPURL = root.getElementsByTagName("virtaSOAPURL").item(0).getFirstChild().getNodeValue();
         this.virtaVersionForXRoad = root.getElementsByTagName("virtaVersionForXRoad").item(0).getFirstChild().getNodeValue();
         this.virtaServiceSchema = root.getElementsByTagName("virtaServiceSchema").item(0).getFirstChild().getNodeValue();
 
@@ -132,8 +132,8 @@ public class ASConfiguration {
         return adapterServiceWSDLPath;
     }
 
-    public String getVirtaWSDLURL() {
-        return virtaWSDLURL;
+    public String getVirtaSOAPURL() {
+        return virtaSOAPURL;
     }
 
     public String getVirtaVersionForXRoad() { return virtaVersionForXRoad; }

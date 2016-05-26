@@ -3,10 +3,15 @@ Asennus ja käyttöohjeet - Kapa-Virta sovitinpalvelimelle:
 Yleistä:
 -Toteutettu Java8:lla käyttäen Springframeworkkia ja Springboottia
 -Buildin teko tapahtuu Mavenilla
+-pom.xml tiedostossa 
 -Kehitysympäristössä Springboot käynnistys komennolla: mvn spring-boot:run
 -.jar paketin luonti tuotantoa varten target/ -kansioon komennolla: mvn package
 -Target kansioon generoidaan myös adapterServiceConf.xml ja opiskelijatiedot.wsdl
 ja nämä tiedostot täytyy kopioida jar tiedoston lisäksi mukaan
+
+Sovitinpalvelin jakaa WSDL-kuvaustaan polusta <osoite:portti>/resources/kapavirta_as.wsdl
+
+Sovitinpalvelimen SOAP-rajapinta toimii polussa <osoite:portti>/ws
 
 --------------------------------------------------
 Springboot
@@ -37,7 +42,7 @@ Konfiguraatiotiedosto adapterServiceConf.xml
 ->adapterServiceWSDLPath: Polku johon sovitinpalvelin generoi oman wsdl kuvauksensa ja josta se sitä jakaa eteenpäin
 
 -->> virta sisältää virta tietovarannon tai sen testiympäristön konfiguraatiot
-->virtaWSDLURL: Osoite josta virran wsdl kuvaus on saatavilla.
+->virtaSOAPURL: Osoite Virran SOAP-rajapintaan
 ->virtaServiceSchema: Virran käyttämä skeeman URL pyyntö- ja vastaustyypeille. (Esim. versiossa 1.06: http://tietovaranto.csc.fi/luku)
 ->virtaVersionIdForXRoad: XRoadin vaatima versionumero Virran palveluista, joka näkyy XRoadin käyttäjille.
 
