@@ -28,7 +28,8 @@ public class VirtaXRoadEndpointConfiguration extends WebMvcConfigurerAdapter {
                     .addResourceLocations("file:"+resourceLocation);
         }
         catch(Exception e) {
-
+            log.error("Error in WSDL resource initialization.");
+            log.error(e.toString());
         }
     }
 }

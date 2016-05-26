@@ -161,11 +161,13 @@ public class MessageTransformer {
         }
         catch(Exception e){
             if(direction == MessageDirection.XRoadToVirta){
-                log.error("Error in parsing request message.\n"+e.toString());
+                log.error("Error in parsing request message.");
+                log.error(e.toString());
                 return stripXmlDefinition(faultMessageService.generateSOAPFault(message, faultMessageService.getReqValidFail(), this.xroadHeaderElement));
             }
             else {
-                log.error("Error in parsing response message.\n"+e.toString());
+                log.error("Error in parsing response message");
+                log.error(e.toString());
                 return stripXmlDefinition(faultMessageService.generateSOAPFault(message, faultMessageService.getResValidFail(), this.xroadHeaderElement));
             }
         }

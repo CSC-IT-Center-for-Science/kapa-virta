@@ -60,7 +60,10 @@ public class VirtaXRoadEndpoint {
         //Send transformed SOAP-request to Virta
         HttpResponse virtaResponse = virtaClient.getVirtaWS(virtaRequestMessage);
         if(virtaResponse == null){
-            new ResponseEntity<>(ERROR_MESSAGE, httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(faultMessageService.generateSOAPFault(ERROR_MESSAGE,
+                    faultMessageService.getResValidFail(),
+                    messageTransformer.getXroadHeaderElement()),
+                    httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         //Exctract response message
@@ -97,24 +100,5 @@ public class VirtaXRoadEndpoint {
         }
 
         return new ResponseEntity<>(XRoadResponseMessage, httpHeaders, HttpStatus.OK);
-    }
-
-    private String readFile(String filename) throws Exception {
-        String content = null;
-        File file = new File(filename);
-        FileReader reader = null;
-        try {
-            reader = new FileReader(file);
-            char[] chars = new char[(int) file.length()];
-            reader.read(chars);
-            content = new String(chars);
-            reader.close();
-        }
-        finally {
-            if(reader != null){
-                reader.close();
-            }
-        }
-        return content;
     }
 }

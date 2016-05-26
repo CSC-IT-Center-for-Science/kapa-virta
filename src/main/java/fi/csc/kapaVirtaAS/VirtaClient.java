@@ -50,7 +50,7 @@ public class VirtaClient {
             return client.execute(post);
         }
         catch(IOException e) {
-            log.error(e.getStackTrace().toString());
+            log.error(e.toString());
         }
 
         return null;
