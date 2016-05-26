@@ -11,9 +11,6 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileReader;
 import java.io.StringWriter;
 
 /**
@@ -21,20 +18,23 @@ import java.io.StringWriter;
  */
 public class FaultMessageService {
 
-    private static String reqValidFail = "Virta adapter service failed to process request message";
-    private static String resValidFail = "Virta adapter service failed to process response message";
+    private final String reqValidFail = "Virta adapter service failed to process request message";
+    private final String resValidFail = "Virta adapter service failed to process response message";
 
-    public static String getReqValidFail() {
+    public FaultMessageService() {
+    }
+
+    public String getReqValidFail() {
         return reqValidFail;
     }
 
-    public static String getResValidFail() {
+    public String getResValidFail() {
         return resValidFail;
     }
 
-    public static String generateSOAPFault(String message, String faultString, Node xroadHeaderElement) throws Exception {
+    public String generateSOAPFault(String message, String faultString, Node xroadHeaderElement) throws Exception {
         DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Document doc = dBuilder.parse(new InputSource(new ByteArrayInputStream((readFile("src/main/resources/FaultMessageBody.xml")).getBytes())));
+        Document doc = dBuilder.parse(new InputSource(getClass().getResourceAsStream("/FaultMessageBody.xml")));
         doc.setXmlVersion("1.0");
         doc.normalizeDocument();
         Element root = doc.getDocumentElement();
@@ -59,24 +59,5 @@ public class FaultMessageService {
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
         transformer.transform(domSource, result);
         return writer.toString();
-    }
-
-    private static String readFile(String filename) throws Exception {
-        String content = null;
-        File file = new File(filename);
-        FileReader reader = null;
-        try {
-            reader = new FileReader(file);
-            char[] chars = new char[(int) file.length()];
-            reader.read(chars);
-            content = new String(chars);
-            reader.close();
-        }
-        finally {
-            if(reader != null){
-                reader.close();
-            }
-        }
-        return content;
     }
 }

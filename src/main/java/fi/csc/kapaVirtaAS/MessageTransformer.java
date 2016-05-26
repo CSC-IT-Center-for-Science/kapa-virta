@@ -23,6 +23,7 @@ import java.io.StringWriter;
 public class MessageTransformer {
     private static final Logger log = LoggerFactory.getLogger(VirtaClient.class);
     private ASConfiguration conf;
+    private FaultMessageService faultMessageService;
     private String xroadSchemaPrefix;
     private String xroadIdSchemaPrefix;
     private String virtaServicePrefix = "xmlns:virtaluku";
@@ -38,8 +39,9 @@ public class MessageTransformer {
         return xroadHeaderElement;
     }
 
-    public MessageTransformer(ASConfiguration conf) {
+    public MessageTransformer(ASConfiguration conf, FaultMessageService faultMessageService) {
         this.conf = conf;
+        this.faultMessageService = faultMessageService;
     }
 
     public String transform(String message, MessageDirection direction) throws Exception {
@@ -160,11 +162,11 @@ public class MessageTransformer {
         catch(Exception e){
             if(direction == MessageDirection.XRoadToVirta){
                 log.error("Error in parsing request message.\n"+e.toString());
-                return stripXmlDefinition(FaultMessageService.generateSOAPFault(message, FaultMessageService.getReqValidFail(), this.xroadHeaderElement));
+                return stripXmlDefinition(faultMessageService.generateSOAPFault(message, faultMessageService.getReqValidFail(), this.xroadHeaderElement));
             }
             else {
                 log.error("Error in parsing response message.\n"+e.toString());
-                return stripXmlDefinition(FaultMessageService.generateSOAPFault(message, FaultMessageService.getResValidFail(), this.xroadHeaderElement));
+                return stripXmlDefinition(faultMessageService.generateSOAPFault(message, faultMessageService.getResValidFail(), this.xroadHeaderElement));
             }
         }
     }

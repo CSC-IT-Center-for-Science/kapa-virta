@@ -36,7 +36,9 @@ public class VirtaXRoadEndpoint {
 
     @RequestMapping(value="/ws", method= RequestMethod.POST)
     public ResponseEntity<String> getVirtaResponse(@RequestBody String XRoadRequestMessage) throws Exception{
-        MessageTransformer messageTransformer = new MessageTransformer(conf);
+        FaultMessageService faultMessageService = new FaultMessageService();
+        MessageTransformer messageTransformer = new MessageTransformer(conf, faultMessageService);
+
         VirtaClient virtaClient = new VirtaClient();
 
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -49,8 +51,8 @@ public class VirtaXRoadEndpoint {
                     MessageTransformer.MessageDirection.XRoadToVirta);
         } catch (Exception e){
             log.error(e.toString());
-            return new ResponseEntity<>(FaultMessageService.generateSOAPFault(ERROR_MESSAGE,
-                            FaultMessageService.getReqValidFail(),
+            return new ResponseEntity<>(faultMessageService.generateSOAPFault(ERROR_MESSAGE,
+                            faultMessageService.getReqValidFail(),
                             messageTransformer.getXroadHeaderElement()),
                     httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -75,8 +77,8 @@ public class VirtaXRoadEndpoint {
             virtaResponseMessage = result.toString();
         } catch (Exception e){
             log.error(e.toString());
-            return new ResponseEntity<>(FaultMessageService.generateSOAPFault(ERROR_MESSAGE,
-                    FaultMessageService.getResValidFail(),
+            return new ResponseEntity<>(faultMessageService.generateSOAPFault(ERROR_MESSAGE,
+                    faultMessageService.getResValidFail(),
                     messageTransformer.getXroadHeaderElement()),
                     httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -88,8 +90,8 @@ public class VirtaXRoadEndpoint {
                     MessageTransformer.MessageDirection.VirtaToXRoad);
         } catch (Exception e){
             log.error(e.toString());
-            return new ResponseEntity<>(FaultMessageService.generateSOAPFault(ERROR_MESSAGE,
-                    FaultMessageService.getResValidFail(),
+            return new ResponseEntity<>(faultMessageService.generateSOAPFault(ERROR_MESSAGE,
+                    faultMessageService.getResValidFail(),
                     messageTransformer.getXroadHeaderElement()),
                     httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
         }
