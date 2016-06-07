@@ -44,11 +44,12 @@ public class VirtaXRoadEndpoint {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.TEXT_XML);
 
-        //Transform SOAP-request to Virta
-        String virtaRequestMessage;
+        HttpResponse virtaResponse;
         try {
-            virtaRequestMessage = messageTransformer.transform(XRoadRequestMessage,
+            String virtaRequestMessage = messageTransformer.transform(XRoadRequestMessage,
                     MessageTransformer.MessageDirection.XRoadToVirta);
+            //Send transformed SOAP-request to Virta
+            virtaResponse = virtaClient.getVirtaWS(virtaRequestMessage);
         } catch (Exception e){
             log.error(e.toString());
             return new ResponseEntity<>(faultMessageService.generateSOAPFault(ERROR_MESSAGE,
@@ -57,17 +58,7 @@ public class VirtaXRoadEndpoint {
                     httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        //Send transformed SOAP-request to Virta
-        HttpResponse virtaResponse = virtaClient.getVirtaWS(virtaRequestMessage);
-        if(virtaResponse == null){
-            return new ResponseEntity<>(faultMessageService.generateSOAPFault(ERROR_MESSAGE,
-                    faultMessageService.getResValidFail(),
-                    messageTransformer.getXroadHeaderElement()),
-                    httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        //Exctract response message
-        String virtaResponseMessage;
+        String XRoadResponseMessage;
         try {
             BufferedReader rd = new BufferedReader(
                     new InputStreamReader(virtaResponse.getEntity().getContent()));
@@ -77,18 +68,8 @@ public class VirtaXRoadEndpoint {
             while ((line = rd.readLine()) != null) {
                 result.append(line);
             }
-            virtaResponseMessage = result.toString();
-        } catch (Exception e){
-            log.error(e.toString());
-            return new ResponseEntity<>(faultMessageService.generateSOAPFault(ERROR_MESSAGE,
-                    faultMessageService.getResValidFail(),
-                    messageTransformer.getXroadHeaderElement()),
-                    httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+            String virtaResponseMessage = result.toString();
 
-        //Transform SOAP-response to XRoad
-        String XRoadResponseMessage;
-        try {
             XRoadResponseMessage = messageTransformer.transform(virtaResponseMessage,
                     MessageTransformer.MessageDirection.VirtaToXRoad);
         } catch (Exception e){

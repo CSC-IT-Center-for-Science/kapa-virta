@@ -52,7 +52,6 @@ public class WSDLManipulator {
 
         // Root element <wsdl:definitions> attribute manipulations
         Element root = doc.getDocumentElement();
-
         root.setAttribute("xmlns:"+conf.getXroadSchemaPrefixForWSDL(), conf.getXroadSchema());
         root.setAttribute("xmlns:"+conf.getXroadIdSchemaPrefixForWSDL(), conf.getXroadIdSchema());
 
@@ -68,9 +67,11 @@ public class WSDLManipulator {
                 NamedNodeMap schemaAttributes = schema.getAttributes();
                 if(schemaAttributes != null && schemaAttributes.getNamedItem("xmlns:virtaluku") != null) {
                     schemaAttributes.getNamedItem("xmlns:virtaluku").setTextContent(conf.getAdapterServiceSchema());
+
                     if (schemaAttributes != null && schemaAttributes.getNamedItem("targetNamespace") != null) {
                         schemaAttributes.getNamedItem("targetNamespace").setTextContent(conf.getAdapterServiceSchema());
                     }
+
                     Element el = (Element) schema.appendChild(doc.createElement("xs:import"));
                     el.setAttribute("id", conf.getXroadSchemaPrefixForWSDL());
                     el.setAttribute("namespace", conf.getXroadSchema());
@@ -83,9 +84,9 @@ public class WSDLManipulator {
                         if (el1.getNodeName() == "xs:element") {
                             replaceAttribute(el1, "name", StringUtils.substringBefore(el1.getAttribute("name"), "Request"));
                         }
-
                     }
                 }
+
             }
         }
 
@@ -106,24 +107,24 @@ public class WSDLManipulator {
         NodeList childrenList = root.getChildNodes();
         for (int i = 0; i < childrenList.getLength(); ++i) {
 
-            if (childrenList.item(i).getNodeName().contains("wsdl:binding")) {
+            if (childrenList.item(i).getNodeName().contains(":binding")) {
                 NodeList binding = childrenList.item(i).getChildNodes();
                 for (int j = 0; j < binding.getLength(); ++j) {
-                    if (binding.item(j).getNodeName().contains("wsdl:operation")) {
+                    if (binding.item(j).getNodeName().contains(":operation")) {
                         Element el1 = (Element) binding.item(j).appendChild(doc.createElement(conf.getXroadIdSchemaPrefixForWSDL()+":version"));
                         el1.setTextContent(conf.getVirtaVersionForXRoad());
 
                         for (Node child = binding.item(j).getFirstChild(); child != null; child = child.getNextSibling()) {
 
                             // Append xroad wsdl:binding operation headers
-                            if (child.getNodeName().contains("wsdl:input") || child.getNodeName().contains("wsdl:output")) {
+                            if (child.getNodeName().contains(":input") || child.getNodeName().contains(":output")) {
                                 Element el = (Element) child;
                                 for(String xroadHeader : conf.getXroadHeaders()) {
                                     el.appendChild(soapHeader(doc.createElement("soap:header"), "tns:requestheader", xroadHeader, "literal"));
                                 }
                             }
 
-                            if (child.getNodeName().contains("wsdl:input")) {
+                            if (child.getNodeName().contains(":input")) {
                                 Element  el = (Element) child;
                                 replaceAttribute(el, "name", StringUtils.substringBefore(el.getAttribute("name"), "Request"));
                             }
@@ -131,19 +132,19 @@ public class WSDLManipulator {
                     }
                 }
             // Remove Request from wsdl:message > wsdl:part element so that can see element
-            } else if (childrenList.item(i).getNodeName().contains("wsdl:message")
+            } else if (childrenList.item(i).getNodeName().contains(":message")
                     && childrenList.item(i).getAttributes().getNamedItem("name").getNodeValue().contains("Request")) {
                 Element part = (Element) childrenList.item(i).getFirstChild().getNextSibling();
                 replaceAttribute(part, "element", StringUtils.substringBefore(part.getAttribute("element"), "Request"));
             }
 
             // Change wsdl input names to meet XRoad standard
-            if (childrenList.item(i).getNodeName().contains("wsdl:portType")) {
+            if (childrenList.item(i).getNodeName().contains(":portType")) {
                 NodeList binding = childrenList.item(i).getChildNodes();
                 for (int j = 0; j < binding.getLength(); ++j) {
-                    if (binding.item(j).getNodeName().contains("wsdl:operation")) {
+                    if (binding.item(j).getNodeName().contains(":operation")) {
                         for (Node child = binding.item(j).getFirstChild(); child != null; child = child.getNextSibling()) {
-                            if (child.getNodeName().contains("wsdl:input")) {
+                            if (child.getNodeName().contains(":input")) {
                                 Element el = (Element) child;
                                 replaceAttribute(el, "name", StringUtils.substringBefore(el.getAttribute("name"), "Request"));
                             }
@@ -153,12 +154,12 @@ public class WSDLManipulator {
             }
 
             // Append kapaVirtaAS service address
-            if (childrenList.item(i).getNodeName().contains("wsdl:service")) {
+            if (childrenList.item(i).getNodeName().contains(":service")) {
                 NodeList service= childrenList.item(i).getChildNodes();
                 for (int j = 0; j < service.getLength(); ++j) {
-                    if (service.item(j).getNodeName().contains("wsdl:port")) {
+                    if (service.item(j).getNodeName().contains(":port")) {
                         for (Node child = service.item(j).getFirstChild(); child != null; child = child.getNextSibling()) {
-                            if (child.getNodeName().contains("soap:address")){
+                            if (child.getNodeName().contains(":address")){
                                 Element el = (Element) child;
                                 replaceAttribute(el, "location", conf.getAdapterServiceSOAPURL());
                             }

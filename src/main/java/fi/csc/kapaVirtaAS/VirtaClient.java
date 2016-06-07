@@ -33,26 +33,19 @@ public class VirtaClient {
 
     private static final ASConfiguration conf = new ASConfiguration();
     private static final Logger log = LoggerFactory.getLogger(VirtaClient.class);
+    private HttpClient client;
 
     public VirtaClient() {
+        client = HttpClientBuilder.create().build();
     }
 
-    public HttpResponse getVirtaWS(String virtaRequestMessage) {
-        try {
-            HttpClient client = HttpClientBuilder.create().build();
-
-            //HTTP post
-            HttpPost post = new HttpPost(conf.getVirtaSOAPURL());
-            post.setHeader("Content-type","text/xml");
-            //SOAP message to HTTP body
-            HttpEntity entity = new ByteArrayEntity(virtaRequestMessage.getBytes());
-            post.setEntity(entity);
-            return client.execute(post);
-        }
-        catch(IOException e) {
-            log.error(e.toString());
-        }
-
-        return null;
+    public HttpResponse getVirtaWS(String virtaRequestMessage) throws Exception {
+        //HTTP post
+        HttpPost post = new HttpPost(conf.getVirtaSOAPURL());
+        post.setHeader("Content-type","text/xml");
+        //SOAP message to HTTP body
+        HttpEntity entity = new ByteArrayEntity(virtaRequestMessage.getBytes());
+        post.setEntity(entity);
+        return client.execute(post);
     }
 }
