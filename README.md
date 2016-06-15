@@ -4,6 +4,6 @@ Sovitinpalvelin toimii xroad-liityntäpalvelimen ja Virta-tietovarannon väliss�
 
 # Copying and License
 
-This material is copyright (c) 2016 CSC -IT Center For Science
+This material is copyright (c) 2016 CSC - IT Center For Science
 
-This project is distributed under The MIT License (MIT). The full text of the license can be found at: LICENSE.info
+This project is distributed under The MIT License (MIT). The full text of the license can be found at: [License.txt](LICENSE.txt)
