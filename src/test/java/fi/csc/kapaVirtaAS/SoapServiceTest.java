@@ -90,7 +90,7 @@ public class SoapServiceTest {
     public void testResponseContentType() throws  Exception {
         mockMvc.perform(post("/ws/").content(testReq1))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType("text/xml"));
+                .andExpect(content().contentType("text/xml;charset=UTF-8"));
     }
 
     @Test
