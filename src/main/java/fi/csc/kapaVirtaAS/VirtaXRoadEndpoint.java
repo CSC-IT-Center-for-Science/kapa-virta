@@ -24,6 +24,7 @@ SOFTWARE.
 
 package fi.csc.kapaVirtaAS;
 
+import org.apache.commons.codec.Charsets;
 import org.apache.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +46,6 @@ import java.io.InputStreamReader;
 public class VirtaXRoadEndpoint {
     private static final Logger log = LoggerFactory.getLogger(VirtaXRoadEndpoint.class);
     private static final ASConfiguration conf = new ASConfiguration();
-    private final String[] headersToCopy = {"Content-Type", "Connection", "SOAPAction"};
     private final String ERROR_MESSAGE = "XRoad-Virta adapterservice encountered internal server error";
 
     @RequestMapping(value="/", method= RequestMethod.GET)
@@ -62,7 +62,7 @@ public class VirtaXRoadEndpoint {
         VirtaClient virtaClient = new VirtaClient();
 
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.TEXT_XML);
+        httpHeaders.setContentType(new MediaType("text","xml", Charsets.UTF_8));
 
         HttpResponse virtaResponse;
         try {
