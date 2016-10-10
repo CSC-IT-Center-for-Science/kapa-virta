@@ -59,6 +59,7 @@ public class WSDLManipulator {
         return el;
     }
 
+    //This function will run once on application startup and create a WSDL document.
     public void generateVirtaKapaWSDL() throws Exception{
         // Fetch current WSDL-file
         File inputFile = new File("opiskelijatiedot.wsdl");

@@ -25,6 +25,7 @@ SOFTWARE.
 package fi.csc.kapaVirtaAS;
 
 import org.apache.commons.lang3.StringUtils;
+import org.mockito.internal.exceptions.ExceptionIncludingMockitoWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.*;
@@ -37,9 +38,10 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileReader;
 import java.io.StringWriter;
+import java.util.Optional;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class MessageTransformer {
     private static final Logger log = LoggerFactory.getLogger(VirtaClient.class);
@@ -49,11 +51,10 @@ public class MessageTransformer {
     private String xroadIdSchemaPrefix;
     private String virtaServicePrefix = "xmlns:virtaluku";
     private Node xroadHeaderElement;
-    private Node xroadRequestBody;
 
     public enum MessageDirection {
         XRoadToVirta,
-        VirtaToXRoad;
+        VirtaToXRoad
     }
 
     public Node getXroadHeaderElement() {
@@ -65,6 +66,30 @@ public class MessageTransformer {
         this.faultMessageService = faultMessageService;
     }
 
+    public String createAuthenticationString(String message){
+        try {
+            DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Document doc = dBuilder.parse(new InputSource(new ByteArrayInputStream(stripXmlDefinition(message).getBytes())));
+            doc.setXmlVersion("1.0");
+            doc.normalizeDocument();
+
+            Optional<NodeList> headerNodes = getChildByKeyword(nodeListToStream(doc.getDocumentElement().getChildNodes()), "header");
+            Optional<NodeList> clientHeaders = headerNodes.map(nodeList -> getChildByKeyword(nodeListToStream(nodeList), "client")).orElse(Optional.empty());
+
+            Number l = clientHeaders.get().getLength();
+            l.toString();
+
+            return clientHeaders.map(nodeList -> getNodeByKeyword(nodeListToStream(nodeList), "memberClass").map(node -> node.getTextContent())).orElse(Optional.empty()).orElse("") + ":"
+                + clientHeaders.map(nodeList -> getNodeByKeyword(nodeListToStream(nodeList), "memberCode").map(node -> node.getTextContent())).orElse(Optional.empty()).orElse("") + ":"
+                + clientHeaders.map(nodeList -> getNodeByKeyword(nodeListToStream(nodeList), "subsystemCode").map(node -> node.getTextContent())).orElse(Optional.empty()).orElse("");
+        }
+        catch(Exception e) {
+            log.error("Error in parsing authenticationstring");
+            log.error(e.toString());
+            return "";
+        }
+    }
+
     public String transform(String message, MessageDirection direction) throws Exception {
         try {
             DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -73,101 +98,65 @@ public class MessageTransformer {
             doc.normalizeDocument();
             Element root = doc.getDocumentElement();
 
-            // Save XRoad schema prefix for response message
             if (direction == MessageDirection.XRoadToVirta) {
-                NamedNodeMap rootAttributes = root.getAttributes();
-                for (int i = 0; i < rootAttributes.getLength(); ++i) {
-                    if (rootAttributes.item(i) != null &&
-                            rootAttributes.item(i).getNodeName() != null &&
-                            conf.getXroadSchema().equals(rootAttributes.item(i).getNodeValue())) {
-                        xroadSchemaPrefix = rootAttributes.item(i).getNodeName();
-                    }
-                    if (rootAttributes.item(i) != null &&
-                            rootAttributes.item(i).getNodeName() != null &&
-                            conf.getXroadIdSchema().equals(rootAttributes.item(i).getNodeValue())) {
-                        xroadIdSchemaPrefix = rootAttributes.item(i).getNodeName();
-                    }
-                }
-            }
-            // Add XRoad schemas with saved prefix to response message
-            if (direction == MessageDirection.VirtaToXRoad) {
-                if (xroadSchemaPrefix != null) {
-                    root.setAttribute(xroadSchemaPrefix, conf.getXroadSchema());
-                }
-                if (xroadIdSchemaPrefix != null) {
-                    root.setAttribute(xroadIdSchemaPrefix, conf.getXroadIdSchema());
-                }
-            }
+                // Save XRoad schema prefix for response message
+                xroadSchemaPrefix = namedNodeMapToStream(root.getAttributes())
+                        .filter(node -> node.getNodeValue().toLowerCase().contains(conf.getXroadSchema().toLowerCase()))
+                        .findFirst().orElseThrow(() -> new DOMException(DOMException.NOT_FOUND_ERR, "Xroad schema prefix not found"))
+                        .getNodeName();
 
-            // Change tns schema
-            NamedNodeMap attributes = root.getAttributes();
-            for (int i = 0; i < attributes.getLength(); ++i) {
-                Node attribute = attributes.item(i);
+                xroadIdSchemaPrefix = namedNodeMapToStream(root.getAttributes())
+                        .filter(node -> node.getNodeValue().toLowerCase().contains(conf.getXroadIdSchema().toLowerCase()))
+                        .findFirst().orElseThrow(() -> new DOMException(DOMException.NOT_FOUND_ERR, "XroadId schema prefix not found"))
+                        .getNodeName();
 
-                if (direction == MessageDirection.XRoadToVirta &&
-                        attribute.getNodeValue().contains(conf.getAdapterServiceSchema())) {
-                    attribute.setNodeValue(conf.getVirtaServiceSchema());
-                }
-                if (direction == MessageDirection.VirtaToXRoad &&
-                        attribute.getNodeValue().contains(conf.getVirtaServiceSchema())) {
-                    attribute.setNodeValue(conf.getAdapterServiceSchema());
-                }
-            }
+                // Change tns schema
+                getNodeByKeyword(namedNodeMapToStream(root.getAttributes()), conf.getAdapterServiceSchema()).map(attribute -> setNodeValueToNode(attribute,conf.getVirtaServiceSchema()));
 
-            //There should be two children under the root node: header and body
-            NodeList children = root.getChildNodes();
-            for (int i = 0; i < children.getLength(); ++i) {
-                Node child = children.item(i);
-
-                //Change SOAP-headers
-                if (child != null && child.getNodeName().toLowerCase().contains("header")) {
-                    if (direction == MessageDirection.XRoadToVirta) {
-                        //Save XRoadHeaderElement for response message
+                //There should be two children under the root node: header and body
+                for (int i = 0; i < root.getChildNodes().getLength(); ++i) {
+                    Node child = root.getChildNodes().item(i);
+                    // Save soap-headers for reply message and remove child elements under soap-headers
+                    if(child.getNodeName().toLowerCase().contains("header")){
                         this.xroadHeaderElement = child.cloneNode(true);
-
-                        //Strip XRoad SOAP-headers for Virta
-                        //Replace SOAP-headers with same element without children
-                        root.replaceChild(children.item(i).cloneNode(false), children.item(i));
+                        root.replaceChild(child.cloneNode(false), child);
                     }
-
-                    if (direction == MessageDirection.VirtaToXRoad && this.xroadHeaderElement != null) {
-                        //Append XRoad SOAP-headers back
-                        for (int j = 0; j < this.xroadHeaderElement.getChildNodes().getLength(); ++j) {
-                            child.appendChild(doc.importNode(this.xroadHeaderElement.getChildNodes().item(j), true));
-                        }
-                    }
-                }
-
-                //Change SOAP-body
-                if (child != null && child.getNodeName().toLowerCase().contains("body")) {
-                    for (Node bodyNode = child.getFirstChild(); bodyNode != null; bodyNode = bodyNode.getNextSibling()) {
-                        //Change request appendix to operation input name
-                        if (bodyNode.getNodeType() == Node.ELEMENT_NODE) {
-                            Element soapOperationElement = (Element) bodyNode;
-
-                            //Virta gives malformed soap fault message. Need to parse it correct.
-                            if (bodyNode.getNodeName().toLowerCase().contains("fault")) {
-                                ((Element) soapOperationElement.getElementsByTagName("faultstring").item(0)).removeAttribute("xml:lang");
-                            } else {
-
-                                if (direction == MessageDirection.XRoadToVirta) {
-                                    //Save XRoadRequestBody for response message
-                                    xroadRequestBody = soapOperationElement.cloneNode(true);
-
-                                    //Add postfix after SOAP-operation name
-                                    //eg. Opintosuoritukset -> OpintosuorituksetRequest
-                                    doc.renameNode(soapOperationElement, conf.getVirtaServiceSchema(), soapOperationElement.getTagName() + "Request");
-                                }
-
-                                if (direction == MessageDirection.VirtaToXRoad) {
-                                    //Response part namespace change
-                                    soapOperationElement.removeAttribute(virtaServicePrefix);
-                                    soapOperationElement.setAttribute(virtaServicePrefix, conf.getAdapterServiceSchema());
-                                }
+                    // Change SOAP-body
+                    else if(child.getNodeName().toLowerCase().contains("body")) {
+                        for(int j = 0; j < child.getChildNodes().getLength(); ++j) {
+                            if(child.getChildNodes().item(j).getNodeType() == Node.ELEMENT_NODE) {
+                                doc.renameNode(child.getChildNodes().item(j), conf.getVirtaServiceSchema(),child.getChildNodes().item(j).getNodeName() + "Request");
+                                break;
                             }
                         }
+
                     }
                 }
+            }
+            if (direction == MessageDirection.VirtaToXRoad) {
+                // Add XRoad schemas with saved prefix to response message
+                root.setAttribute(xroadSchemaPrefix, conf.getXroadSchema());
+                root.setAttribute(xroadIdSchemaPrefix, conf.getXroadIdSchema());
+
+                // Change tns schema
+                getNodeByKeyword(namedNodeMapToStream(root.getAttributes()), conf.getVirtaServiceSchema()).map(attribute -> setNodeValueToNode(attribute,conf.getAdapterServiceSchema()));
+
+                // Change SOAP-headers
+                Node headerNode = getNodeByKeyword(nodeListToStream(root.getChildNodes()), "header").get();
+                for (int i = 0; i < this.xroadHeaderElement.getChildNodes().getLength(); ++i) {
+                    headerNode.appendChild(doc.importNode(this.xroadHeaderElement.getChildNodes().item(i), true));
+                }
+
+                // Change SOAP-body
+                getNodeByKeyword(nodeListToStream(root.getChildNodes()),"body")
+                        .map(bodyNode -> removeAttribureFromElement(nodeToElement(bodyNode),virtaServicePrefix))
+                        .map(bodyNode -> setAttributeToElement(nodeToElement(bodyNode), virtaServicePrefix, conf.getAdapterServiceSchema()));
+
+                //Virta gives malformed soap fault message. Need to parse it correct.
+                getNodeByKeyword(nodeListToStream(root.getChildNodes()),"body")
+                        .map(bodyNode -> nodeListToStream(bodyNode.getChildNodes()))
+                        .map(nodesInBodyStream -> getNodeByKeyword(nodesInBodyStream, "fault")
+                            .map(faultNode -> removeAttribureFromElement(nodeToElement(nodeToElement(faultNode).getElementsByTagName("faultstring").item(0)),"xml:lang")));
             }
 
             doc.normalizeDocument();
@@ -181,10 +170,9 @@ public class MessageTransformer {
             return stripXmlDefinition(message);
         }
         catch(Exception e){
-            if(direction == MessageDirection.XRoadToVirta){
+            if(direction == MessageDirection.XRoadToVirta) {
                 log.error("Error in parsing request message.");
-                log.error(e.toString());
-                return stripXmlDefinition(faultMessageService.generateSOAPFault(message, faultMessageService.getReqValidFail(), this.xroadHeaderElement));
+                throw e;
             }
             else {
                 log.error("Error in parsing response message");
@@ -194,14 +182,54 @@ public class MessageTransformer {
         }
     }
 
+    private Node setNodeValueToNode(Node n, String value) {
+        n.setNodeValue(value);
+        return n;
+    }
+
+    private Element setAttributeToElement(Element e, String var1, String var2) {
+        e.setAttribute(var1, var2);
+        return e;
+    }
+
+    private Element removeAttribureFromElement(Element e, String attribute) {
+        e.removeAttribute(attribute);
+        return e;
+    }
+
+    private Element nodeToElement(Node node) {
+        return (Element) node;
+    }
+
+    private Stream<Node> namedNodeMapToStream(NamedNodeMap namedNodeMap) {
+        return IntStream.range(0, namedNodeMap.getLength()).mapToObj(namedNodeMap::item);
+    }
+
+    private Stream<Node> nodeListToStream(NodeList nodelist) {
+        return IntStream.range(0, nodelist.getLength()).mapToObj(nodelist::item).filter(item -> item.getNodeType() == Node.ELEMENT_NODE);
+    }
+
+    private Optional<Node> getNodeByKeyword(Stream<Node> nodeStream, String keyword) {
+        return nodeStream
+                .filter(x -> x.getNodeName().toLowerCase().contains(keyword.toLowerCase()))
+                .findFirst();
+    }
+
+    private Optional<NodeList> getChildByKeyword(Stream<Node> nodeStream, String keyword) {
+        return nodeStream
+                .filter(x -> x.getNodeName().toLowerCase().contains(keyword.toLowerCase()))
+                .findFirst()
+                .map(x -> x.getChildNodes());
+    }
+
+    //Removes xml definition element, if any
+    //eg. <?xml version="1.0" encoding="UTF-8" standalone="no"?>
     private String stripXmlDefinition(String message) {
-        //Remove xml definition element, if any
-        //eg. <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
         String sub = StringUtils.substringAfter(message, "?>");
-        if(sub != null && sub != ""){
+        if(sub != null && sub != "") {
             return sub;
         }
         return message;
     }
-
 }

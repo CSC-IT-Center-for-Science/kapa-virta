@@ -25,7 +25,9 @@ SOFTWARE.
 package fi.csc.kapaVirtaAS;
 
 import org.apache.commons.codec.Charsets;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -36,17 +38,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.w3c.dom.DOMException;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.InputStreamReader;
 
 @RestController
 public class VirtaXRoadEndpoint {
     private static final Logger log = LoggerFactory.getLogger(VirtaXRoadEndpoint.class);
     private static final ASConfiguration conf = new ASConfiguration();
-    private final String ERROR_MESSAGE = "XRoad-Virta adapterservice encountered internal server error";
+    private final String ERROR_MESSAGE = "XRoad-Virta adapterservice encountered error with status: ";
 
     @RequestMapping(value="/", method= RequestMethod.GET)
     public String healthCheck(){
@@ -58,28 +59,35 @@ public class VirtaXRoadEndpoint {
     public ResponseEntity<String> getVirtaResponse(@RequestBody String XRoadRequestMessage) throws Exception{
         FaultMessageService faultMessageService = new FaultMessageService();
         MessageTransformer messageTransformer = new MessageTransformer(conf, faultMessageService);
-
         VirtaClient virtaClient = new VirtaClient();
-
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(new MediaType("text","xml", Charsets.UTF_8));
-
         HttpResponse virtaResponse;
+
         try {
             String virtaRequestMessage = messageTransformer.transform(XRoadRequestMessage,
                     MessageTransformer.MessageDirection.XRoadToVirta);
             //Send transformed SOAP-request to Virta
-            virtaResponse = virtaClient.getVirtaWS(virtaRequestMessage);
+            virtaResponse = virtaClient.getVirtaWS(virtaRequestMessage, messageTransformer.createAuthenticationString(XRoadRequestMessage));
         } catch (Exception e){
             log.error(e.toString());
-            return new ResponseEntity<>(faultMessageService.generateSOAPFault(ERROR_MESSAGE,
-                            faultMessageService.getReqValidFail(),
-                            messageTransformer.getXroadHeaderElement()),
-                    httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
+            HttpStatus errorStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            String errorMessage = ERROR_MESSAGE;
+            if(e instanceof DOMException){
+                errorStatus = HttpStatus.BAD_REQUEST;
+                errorMessage = "Request SOAP-headers did not contain client identifiers (http://x-road.eu/xsd/identifiers)";
+            }
+            return new ResponseEntity<>(faultMessageService.generateSOAPFault(errorMessage,
+                    faultMessageService.getReqValidFail(),
+                    messageTransformer.getXroadHeaderElement()),
+                    httpHeaders, errorStatus);
         }
 
-        String XRoadResponseMessage;
         try {
+            if(virtaResponse.getStatusLine().getStatusCode() != 200){
+                log.error(virtaResponse.getStatusLine().getReasonPhrase());
+                throw new HttpResponseException(virtaResponse.getStatusLine().getStatusCode(), virtaResponse.getStatusLine().getReasonPhrase());
+            }
             BufferedReader rd = new BufferedReader(
                     new InputStreamReader(virtaResponse.getEntity().getContent()));
 
@@ -90,16 +98,20 @@ public class VirtaXRoadEndpoint {
             }
             String virtaResponseMessage = result.toString();
 
-            XRoadResponseMessage = messageTransformer.transform(virtaResponseMessage,
-                    MessageTransformer.MessageDirection.VirtaToXRoad);
-        } catch (Exception e){
+            return new ResponseEntity<>(messageTransformer.transform(virtaResponseMessage,
+                    MessageTransformer.MessageDirection.VirtaToXRoad), httpHeaders, HttpStatus.OK);
+        } catch (Exception e) {
             log.error(e.toString());
-            return new ResponseEntity<>(faultMessageService.generateSOAPFault(ERROR_MESSAGE,
+            HttpStatus status = HttpStatus.valueOf(virtaResponse.getStatusLine().getStatusCode());
+            if(status.value() == 200) {
+                status = HttpStatus.INTERNAL_SERVER_ERROR;
+            } else if (IOUtils.toString(virtaResponse.getEntity().getContent()).toLowerCase().contains("access denied")) {
+                status = HttpStatus.FORBIDDEN;
+            }
+            return new ResponseEntity<>(faultMessageService.generateSOAPFault(ERROR_MESSAGE+status.name(),
                     faultMessageService.getResValidFail(),
                     messageTransformer.getXroadHeaderElement()),
-                    httpHeaders, HttpStatus.INTERNAL_SERVER_ERROR);
+                    httpHeaders, status);
         }
-
-        return new ResponseEntity<>(XRoadResponseMessage, httpHeaders, HttpStatus.OK);
     }
 }
