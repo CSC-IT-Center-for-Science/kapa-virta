@@ -79,7 +79,8 @@ public class MessageTransformer {
             Number l = clientHeaders.get().getLength();
             l.toString();
 
-            return clientHeaders.map(nodeList -> getNodeByKeyword(nodeListToStream(nodeList), "memberClass").map(node -> node.getTextContent())).orElse(Optional.empty()).orElse("") + ":"
+            return clientHeaders.map(nodeList -> getNodeByKeyword(nodeListToStream(nodeList), "xRoadInstance").map(node -> node.getTextContent())).orElse(Optional.empty()).orElse("") + ":"
+                + clientHeaders.map(nodeList -> getNodeByKeyword(nodeListToStream(nodeList), "memberClass").map(node -> node.getTextContent())).orElse(Optional.empty()).orElse("") + ":"
                 + clientHeaders.map(nodeList -> getNodeByKeyword(nodeListToStream(nodeList), "memberCode").map(node -> node.getTextContent())).orElse(Optional.empty()).orElse("") + ":"
                 + clientHeaders.map(nodeList -> getNodeByKeyword(nodeListToStream(nodeList), "subsystemCode").map(node -> node.getTextContent())).orElse(Optional.empty()).orElse("");
         }
