@@ -38,10 +38,10 @@ Konfiguraatiotiedosto adapterServiceConf.xml
 
 -->> adapterService sisältää tämän sovitinpalvelimen konfiguraatiot ja ne täytyy asettaa oikeaksi
 ->adapterServiceSchema: Haluttu url tämän sovitinpalvelimen skeemaksi. Skeemassa täytyy olla lopussa sama polku kuin virran skeemassa esim. /luku
-->adapterServiceSOAPURL: Tämän liityntäpalvelimen osoite, johon xroad liityntäpalvelin ohjaa xroadilta tulevat SOAP viestit. Osoite lisätään wsdl kuvaukseen. Muista porttinumero, jos käytetään jotain muuta kuin 80.
+->adapterServiceSOAPURL: Tämän sovitinpalvelimen osoite, johon xroad-liityntäpalvelin ohjaa xroadilta tulevat SOAP viestit. Osoite lisätään wsdl kuvaukseen. Muista porttinumero, jos käytetään jotain muuta kuin 80.
 ->adapterServiceWSDLPath: Polku johon sovitinpalvelin generoi oman wsdl kuvauksensa ja josta se sitä jakaa eteenpäin
 
--->> virta sisältää virta tietovarannon tai sen testiympäristön konfiguraatiot
+-->> virta sisältää Virta-tietovarannon tai sen testiympäristön konfiguraatiot
 ->virtaSOAPURL: Osoite Virran SOAP-rajapintaan
 ->virtaServiceSchema: Virran käyttämä skeeman URL pyyntö- ja vastaustyypeille. (Esim. versiossa 1.06: http://tietovaranto.csc.fi/luku)
 ->virtaVersionIdForXRoad: XRoadin vaatima versionumero Virran palveluista, joka näkyy XRoadin käyttäjille.
