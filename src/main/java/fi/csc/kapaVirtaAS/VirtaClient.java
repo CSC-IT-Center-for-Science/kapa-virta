@@ -29,7 +29,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,10 +38,14 @@ public class VirtaClient {
 
     private static final ASConfiguration conf = new ASConfiguration();
     private static final Logger log = LoggerFactory.getLogger(VirtaClient.class);
+    private PoolingHttpClientConnectionManager cm;
     private HttpClient client;
 
-    public VirtaClient() {
-        client = HttpClientBuilder.create().build();
+    public VirtaClient(ASConfiguration conf) {
+        cm = new PoolingHttpClientConnectionManager();
+        Integer poolSize = new Integer(conf.getAdapterServiceConnectionPoolSize());
+        cm.setMaxTotal(poolSize != null ? poolSize.intValue() : 10);
+        client = HttpClients.custom().setConnectionManager(cm).build();
     }
 
     public HttpResponse getVirtaWS(String virtaRequestMessage, String authString) throws Exception {

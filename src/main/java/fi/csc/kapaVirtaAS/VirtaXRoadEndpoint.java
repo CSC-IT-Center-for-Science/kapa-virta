@@ -59,7 +59,7 @@ public class VirtaXRoadEndpoint {
     public ResponseEntity<String> getVirtaResponse(@RequestBody String XRoadRequestMessage) throws Exception{
         FaultMessageService faultMessageService = new FaultMessageService();
         MessageTransformer messageTransformer = new MessageTransformer(conf, faultMessageService);
-        VirtaClient virtaClient = new VirtaClient();
+        VirtaClient virtaClient = new VirtaClient(conf);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(new MediaType("text","xml", Charsets.UTF_8));
         HttpResponse virtaResponse;

@@ -17,6 +17,7 @@
         <adapterServiceSchema>http://test.x-road.virta.csc.fi/luku</adapterServiceSchema>
         <adapterServiceSOAPURL>http://localhost:8080/ws</adapterServiceSOAPURL>
         <adapterServiceWSDLPath>./</adapterServiceWSDLPath>
+        <adapterServiceConnectionPoolSize>10</adapterServiceConnectionPoolSize>
     </adapterService>
     <virta>
         <virtaSOAPURL>http://virtawstesti.csc.fi:80/luku106/OpiskelijanTiedot</virtaSOAPURL>
